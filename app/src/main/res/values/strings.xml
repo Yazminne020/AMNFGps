@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">AMFGps</string>
+    <string name="usuario">Usuario</string>
+    <string name="clave">Clave</string>
+    <string name="empresa">Empresa</string>
+    <string name="ingresar_al_pedido">INGRESAR AL PEDIDO</string>
+    <string name="ingresar">INGRESAR</string>
+    <string name="salir">SALIR</string>
 </resources>

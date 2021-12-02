@@ -7,4 +7,16 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+	<color name="colorPrimary">#56b164</color>
+    <color name="colorPrimaryDark">#385941</color>
+    <color name="colorAccent">#7dbc84</color>
+    <color name="ColorActionBarTitle">#2e8b46</color>
+    <color name="colorExitApp">#FF453C</color>
+    <color name="colorBackground">#F1FFEB</color>
+    <color name="colorSpinner">#D0E4C7</color>
+    <color name="colorDanger">#b71c1c</color>
+    <color name="colorWarning">#f9a825</color>
+    <color name="colorSuccess">#1b5e20</color>
+    <color name="colorBlack">#000</color>
+    <color name="colorWhite">#FFFFFF</color>
 </resources>
