@@ -7,17 +7,6 @@ import android.database.sqlite.SQLiteOpenHelper;
 public class DatabaseHelper extends SQLiteOpenHelper {
     // Table Name
     public static final String TABLE_NAME = "client";
-    public static final String TABLE_ARTTALLAS_DP = "articulotallasdp";
-
-    // table columns TABLE_ARTTALLAS_DP
-    public static final String ARTL_ID = "id";
-    public static final String ARTL_IDTALLA = "idtalla";
-    public static final String ARTL_CANTIDAD = "cantidad";
-    public static final String ARTL_EXISTENCIA = "existencia";
-    public static final String ARTL_DESCRIP_TALLA = "decriptall";
-    public static final String ARTL_DPFK = "dpfk";
-    public static final String ARTL_ESTADO = "estado";
-    // Table columns TABLE_NAME
     public static final String _ID = "_id";
     public static final String NAME = "usuarioc";
     public static final String PASSWD = "clavec";
