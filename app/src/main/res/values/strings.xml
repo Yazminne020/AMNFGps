@@ -6,4 +6,5 @@
     <string name="ingresar_al_pedido">INGRESAR AL PEDIDO</string>
     <string name="ingresar">INGRESAR</string>
     <string name="salir">SALIR</string>
+    <string name="fecha_desde">Fecha Desde</string>
 </resources>
