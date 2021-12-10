@@ -6,6 +6,10 @@
     android:layout_height="match_parent"
     tools:context=".Bienvenido">
 
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/swipeRefreshLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent">
@@ -42,12 +46,21 @@
 
                     <EditText
                         android:id="@+id/etFechaDesdeDialog"
-                        android:layout_width="314dp"
+                        android:layout_width="142dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:autofillHints="01/01/2000"
                         android:hint="@string/fecha_desde"
                         android:inputType="date"
+                        tools:targetApi="o" />
+
+                    <EditText
+                        android:id="@+id/etHora"
+                        android:layout_width="142dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:autofillHints="00:00"
+                        android:hint="@string/hora_desde"
                         tools:targetApi="o" />
 
                     <ImageButton
@@ -74,5 +87,5 @@
             </LinearLayout>
         </LinearLayout>
     </ScrollView>
-
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 </RelativeLayout>

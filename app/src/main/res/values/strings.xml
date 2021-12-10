@@ -7,4 +7,5 @@
     <string name="ingresar">INGRESAR</string>
     <string name="salir">SALIR</string>
     <string name="fecha_desde">Fecha Desde</string>
+    <string name="hora_desde">Hora Desde</string>
 </resources>
