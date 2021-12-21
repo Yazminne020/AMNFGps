@@ -23,6 +23,7 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.StrictMode;
 import android.text.InputType;
 import android.util.Log;
 import android.view.View;
@@ -35,6 +36,7 @@ import android.widget.Toast;
 import com.example.amfgps.utilities.Network;
 
 import org.ksoap2.SoapEnvelope;
+import org.ksoap2.serialization.MarshalBase64;
 import org.ksoap2.serialization.SoapObject;
 import org.ksoap2.serialization.SoapPrimitive;
 import org.ksoap2.serialization.SoapSerializationEnvelope;
@@ -56,14 +58,15 @@ public class Bienvenido extends AppCompatActivity {
     TimePickerDialog.OnTimeSetListener setListenerT;
     public String TAG_ACTIVITY = "Bienvenido";
     private String Oficina,Empresa;
-    private Cliente[] listaClientes;;
+    private Cliente[] listaClientes;
+    private Cita[] listaCitas;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_bienvenido);
         tvFecha = findViewById(R.id.etFechaDesdeDialog);
-        tvHora = findViewById(R.id.etHora);
+//        tvHora = findViewById(R.id.etHora);
         btnUbicacion=findViewById(R.id.btnUbicacion);
         tvB = findViewById(R.id.tvUsuario);
         SwipeRefreshLayout swipeRefreshLayout;
@@ -81,6 +84,8 @@ public class Bienvenido extends AppCompatActivity {
 
         tomarFecha(year, month, day);
         tomarUbicacion();
+
+        listaCitaClientes();
 
         swipeRefreshLayout = findViewById(R.id.swipeRefreshLayout);
         tvB = findViewById(R.id.tvUsuario);
@@ -167,7 +172,7 @@ public class Bienvenido extends AppCompatActivity {
             @Override
             public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
                 month=month+1;
-                tvFecha.setText(dayOfMonth+"/"+month+"/"+year);
+               tvFecha.setText(dayOfMonth+"/"+month+"/"+year);
             }
         };
 
@@ -340,7 +345,7 @@ public class Bienvenido extends AppCompatActivity {
         }
         return Bandera;
     }
-    
+
     public Boolean llamarWS() {
         //
 
@@ -367,5 +372,54 @@ public class Bienvenido extends AppCompatActivity {
             Bandera = false;
         }
         return Bandera;
+    }
+    public Cita[] listaCitaClientes() {
+        //
+        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+        StrictMode.setThreadPolicy(policy);
+
+        boolean Bandera = true;
+        String dato="";
+        Intent intent = getIntent();
+        Bundle extras = intent.getExtras();
+        if (extras != null) {
+            dato = extras.getString("usuarioc");
+        }
+        SoapObject request = new SoapObject(configuracion.NAMESPACE, "ClientesGPS");
+//        request.addProperty("fecha", tvFecha.getText().toString());
+        request.addProperty("fecha", "20/12/2021");
+        request.addProperty("ceduruc", dato);
+        SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(SoapEnvelope.VER11);
+        envelope.dotNet = true;
+        new MarshalBase64().register(envelope); //serialization
+        envelope.encodingStyle = SoapEnvelope.ENC;
+        envelope.setOutputSoapObject(request);
+        HttpTransportSE transporte = new HttpTransportSE(configuracion.URL);
+        //transporte.debug = true;
+        try {
+            transporte.call(configuracion.NAMESPACE + "ClientesGPS", envelope);
+            // Get the response
+            SoapObject resSoap = (SoapObject) envelope.getResponse();
+            listaCitas = new Cita[resSoap.getPropertyCount()];
+            for (int i = 0; i < listaCitas.length; i++) {
+                SoapObject ic = (SoapObject) resSoap.getProperty(i);
+
+                Cita cita = new Cita();
+                cita.diavisita = ic.getProperty("diavisita").toString();
+                cita.observacion = ic.getProperty("observacion").toString();
+                cita.vndr_codigo = ic.getProperty("vndr_codigo").toString();
+                cita.clte_id = ic.getProperty("clte_id").toString();
+                cita.longitud = ic.getProperty("longitud").toString();
+                cita.latitud = ic.getProperty("latitud").toString();
+                cita.cedulaVen = ic.getProperty("cedulaVen").toString();
+                cita.nombreCliente=ic.getProperty("nombreCliente").toString();
+                listaCitas[i] = cita;
+            }
+        } catch (Exception e) {
+            //Print error
+            e.printStackTrace();
+            return null;
+        }
+        return listaCitas;
     }
 }

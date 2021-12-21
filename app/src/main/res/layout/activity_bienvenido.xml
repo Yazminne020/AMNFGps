@@ -54,15 +54,6 @@
                         android:inputType="date"
                         tools:targetApi="o" />
 
-                    <EditText
-                        android:id="@+id/etHora"
-                        android:layout_width="142dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:autofillHints="00:00"
-                        android:hint="@string/hora_desde"
-                        tools:targetApi="o" />
-
                     <ImageButton
                         android:id="@+id/btnFechaDesdeDialog"
                         android:layout_width="45dp"
