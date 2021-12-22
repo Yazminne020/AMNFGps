@@ -71,6 +71,7 @@
                 android:orientation="vertical">
 
                 <ListView
+                    android:id="@+id/lvCitas"
                     android:layout_width="match_parent"
                     android:layout_height="572dp">
 

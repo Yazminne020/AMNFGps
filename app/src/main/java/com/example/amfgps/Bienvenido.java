@@ -27,8 +27,12 @@ import android.os.StrictMode;
 import android.text.InputType;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.DatePicker;
+import android.widget.ImageButton;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
@@ -43,6 +47,7 @@ import org.ksoap2.serialization.SoapSerializationEnvelope;
 import org.ksoap2.transport.HttpTransportSE;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -60,7 +65,9 @@ public class Bienvenido extends AppCompatActivity {
     private String Oficina,Empresa;
     private Cliente[] listaClientes;
     private Cita[] listaCitas;
+    ListView listViewPedido;
 
+    @SuppressLint("WrongViewCast")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -69,6 +76,7 @@ public class Bienvenido extends AppCompatActivity {
 //        tvHora = findViewById(R.id.etHora);
         btnUbicacion=findViewById(R.id.btnUbicacion);
         tvB = findViewById(R.id.tvUsuario);
+        listViewPedido = findViewById(R.id.lvCitas);
         SwipeRefreshLayout swipeRefreshLayout;
 
         final Calendar c = Calendar.getInstance();
@@ -85,7 +93,7 @@ public class Bienvenido extends AppCompatActivity {
         tomarFecha(year, month, day);
         tomarUbicacion();
 
-        listaCitaClientes();
+
 
         swipeRefreshLayout = findViewById(R.id.swipeRefreshLayout);
         tvB = findViewById(R.id.tvUsuario);
@@ -117,11 +125,21 @@ public class Bienvenido extends AppCompatActivity {
             new asynCliente().execute();
         });
 
+        listaCitaClientes();
+        ImageButton button = (ImageButton) findViewById(R.id.btnFechaDesdeDialog);
+        button.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                Intent irbienvenido = new Intent(Bienvenido.this, MapsActivity.class);
+                startActivity(irbienvenido);
+            }
+        });
+
 //        SimpleDateFormat sdf1 = new SimpleDateFormat("HH:mm");// /dd/MM/yyyy HH:mm:ss"/
 //        tvHora.setText(sdf1.format(c.getTime()));
 //        tvHora.setInputType(InputType.TYPE_NULL);
 //
 //        tomarHora(hour, min);
+
 
     }
 
@@ -136,6 +154,7 @@ public class Bienvenido extends AppCompatActivity {
         }
 
         btnUbicacion.setOnClickListener(new View.OnClickListener() {
+            @SuppressLint("MissingPermission")
             @Override
             public void onClick(View view) {
                 LocationManager locationManager=(LocationManager) Bienvenido.this.getSystemService(Context.LOCATION_SERVICE);
@@ -153,6 +172,7 @@ public class Bienvenido extends AppCompatActivity {
                 locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,0,0,locationListener);
             }
         });
+
     }
 
     private void tomarFecha(int year, int month, int day) {

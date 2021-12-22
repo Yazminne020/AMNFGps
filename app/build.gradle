@@ -38,6 +38,7 @@ dependencies {
     implementation files('src/main/java/ksoap2-android-assembly-3.6.4-jar-with-dependencies.jar')
     implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.0.0'
     implementation 'org.jetbrains:annotations:15.0'
+    implementation 'com.google.android.gms:play-services-maps:17.0.0'
     compileOnly 'org.projectlombok:lombok:1.18.22'
     annotationProcessor 'org.projectlombok:lombok:1.18.22'
     testImplementation 'junit:junit:4.+'
