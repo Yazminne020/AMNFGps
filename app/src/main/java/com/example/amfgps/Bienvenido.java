@@ -1,6 +1,7 @@
 package com.example.amfgps;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -14,6 +15,7 @@ import android.app.DatePickerDialog;
 import android.app.ProgressDialog;
 import android.app.TimePickerDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
@@ -51,21 +53,23 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 
-public class Bienvenido extends AppCompatActivity {
+public class Bienvenido extends AppCompatActivity{
 
-    TextView tvFecha, tvB,tvHora;
+    TextView tvFecha, tvB, tvHora;
     Button btnUbicacion;
-    private String _usuario,Usuarioc,empresac,Clave;
+    private String _usuario, Usuarioc, empresac, Clave;
     private ProgressDialog dialogo;
     SwipeRefreshLayout swipeRefreshLayout;
     private int numeroIntentos;
     DatePickerDialog.OnDateSetListener setListener;
     TimePickerDialog.OnTimeSetListener setListenerT;
     public String TAG_ACTIVITY = "Bienvenido";
-    private String Oficina,Empresa;
+    private String Oficina, Empresa;
     private Cliente[] listaClientes;
     private Cita[] listaCitas;
     ListView listViewPedido;
+    CitaAdapter adapterp1;
+    Context context = this;
 
     @SuppressLint("WrongViewCast")
     @Override
@@ -74,7 +78,7 @@ public class Bienvenido extends AppCompatActivity {
         setContentView(R.layout.activity_bienvenido);
         tvFecha = findViewById(R.id.etFechaDesdeDialog);
 //        tvHora = findViewById(R.id.etHora);
-        btnUbicacion=findViewById(R.id.btnUbicacion);
+        btnUbicacion = findViewById(R.id.btnUbicacion);
         tvB = findViewById(R.id.tvUsuario);
         listViewPedido = findViewById(R.id.lvCitas);
         SwipeRefreshLayout swipeRefreshLayout;
@@ -94,8 +98,7 @@ public class Bienvenido extends AppCompatActivity {
         tomarUbicacion();
 
 
-
-        swipeRefreshLayout = findViewById(R.id.swipeRefreshLayout);
+        //swipeRefreshLayout = findViewById(R.id.swipeRefreshLayout);
         tvB = findViewById(R.id.tvUsuario);
         //nombre de empresa
         Empresa = "";
@@ -120,12 +123,12 @@ public class Bienvenido extends AppCompatActivity {
                 Toast.makeText(getApplicationContext(), "Sin acceso a Internet", Toast.LENGTH_LONG).show();
         }
 
-        swipeRefreshLayout.setOnRefreshListener(() -> {
-            Toast.makeText(getApplicationContext(),"...",Toast.LENGTH_LONG);
-            new asynCliente().execute();
-        });
+//        swipeRefreshLayout.setOnRefreshListener(() -> {
+//            Toast.makeText(getApplicationContext(), "...", Toast.LENGTH_LONG);
+//            new asynCliente().execute();
+//        });
 
-        listaCitaClientes();
+
         ImageButton button = (ImageButton) findViewById(R.id.btnFechaDesdeDialog);
         button.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
@@ -133,6 +136,21 @@ public class Bienvenido extends AppCompatActivity {
                 startActivity(irbienvenido);
             }
         });
+
+        ArrayList<Cita> names = new ArrayList<Cita>();
+        Cita[] citas = listaCitaClientes();
+        for (int i = 0; i < citas.length; i++) {
+
+            names.add(citas[i]);
+        }
+        if (listaCitas != null) {
+//            adapterp1 = new ArrayAdapter(context, android.R.layout.simple_list_item_1, names);
+//            listViewPedido.setAdapter(adapterp1);
+            adapterp1 = new CitaAdapter(Bienvenido.this, R.layout.lista_cita_cliente, names);
+            listViewPedido.setAdapter(adapterp1);
+            //ACTIVAR DAR CLICK EN BOTON.
+            //adapterp1.setCustomButtonListner(Bienvenido.this);
+        }
 
 //        SimpleDateFormat sdf1 = new SimpleDateFormat("HH:mm");// /dd/MM/yyyy HH:mm:ss"/
 //        tvHora.setText(sdf1.format(c.getTime()));
@@ -144,12 +162,12 @@ public class Bienvenido extends AppCompatActivity {
     }
 
     private void tomarUbicacion() {
-        int permissionCheck= ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION);
-        if (permissionCheck== PackageManager.PERMISSION_DENIED){
-            if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_FINE_LOCATION)){
+        int permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION);
+        if (permissionCheck == PackageManager.PERMISSION_DENIED) {
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_FINE_LOCATION)) {
 
-            }else {
-                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION},1);
+            } else {
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
             }
         }
 
@@ -157,19 +175,20 @@ public class Bienvenido extends AppCompatActivity {
             @SuppressLint("MissingPermission")
             @Override
             public void onClick(View view) {
-                LocationManager locationManager=(LocationManager) Bienvenido.this.getSystemService(Context.LOCATION_SERVICE);
+                LocationManager locationManager = (LocationManager) Bienvenido.this.getSystemService(Context.LOCATION_SERVICE);
 
-                LocationListener locationListener=new LocationListener() {
+                LocationListener locationListener = new LocationListener() {
                     @Override
                     public void onLocationChanged(@NonNull Location location) {
-                        String val= location.getLatitude()+"  "+ location.getLongitude();
+                        String val = location.getLatitude() + "  " + location.getLongitude();
                     }
 
                     @Override
-                    public void onStatusChanged(String provider, int status, Bundle extras) {}
+                    public void onStatusChanged(String provider, int status, Bundle extras) {
+                    }
                 };
-                int permissionCheck= ContextCompat.checkSelfPermission(Bienvenido.this, Manifest.permission.ACCESS_FINE_LOCATION);
-                locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,0,0,locationListener);
+                int permissionCheck = ContextCompat.checkSelfPermission(Bienvenido.this, Manifest.permission.ACCESS_FINE_LOCATION);
+                locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, locationListener);
             }
         });
 
@@ -179,20 +198,20 @@ public class Bienvenido extends AppCompatActivity {
         tvFecha.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                DatePickerDialog datePickerDialog=new DatePickerDialog(Bienvenido.this,
-                        android.R.style.Theme_Holo_Light_Dialog_MinWidth,setListener,year,month,day);
+                DatePickerDialog datePickerDialog = new DatePickerDialog(Bienvenido.this,
+                        android.R.style.Theme_Holo_Light_Dialog_MinWidth, setListener, year, month, day);
                 datePickerDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-                datePickerDialog.getDatePicker().setMinDate(System.currentTimeMillis()-1000); //Bloquear tiempo pasado
-                datePickerDialog.getDatePicker().setMaxDate(new Date().getTime()+(1000L*60*60*24*31)); //Bloquear tiempo futuro
+                datePickerDialog.getDatePicker().setMinDate(System.currentTimeMillis() - 1000); //Bloquear tiempo pasado
+                datePickerDialog.getDatePicker().setMaxDate(new Date().getTime() + (1000L * 60 * 60 * 24 * 31)); //Bloquear tiempo futuro
                 datePickerDialog.show();
             }
         });
 
-        setListener=new DatePickerDialog.OnDateSetListener() {
+        setListener = new DatePickerDialog.OnDateSetListener() {
             @Override
             public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
-                month=month+1;
-               tvFecha.setText(dayOfMonth+"/"+month+"/"+year);
+                month = month + 1;
+                tvFecha.setText(dayOfMonth + "/" + month + "/" + year);
             }
         };
 
@@ -202,19 +221,20 @@ public class Bienvenido extends AppCompatActivity {
         tvHora.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                TimePickerDialog timePickerDialog=new TimePickerDialog(Bienvenido.this,
-                        android.R.style.Theme_Holo_Light_Dialog_MinWidth,setListenerT,hour,min,true);
+                TimePickerDialog timePickerDialog = new TimePickerDialog(Bienvenido.this,
+                        android.R.style.Theme_Holo_Light_Dialog_MinWidth, setListenerT, hour, min, true);
                 timePickerDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
                 timePickerDialog.show();
             }
         });
-        setListenerT=new TimePickerDialog.OnTimeSetListener() {
+        setListenerT = new TimePickerDialog.OnTimeSetListener() {
             @Override
             public void onTimeSet(TimePicker timePicker, int i, int i1) {
-                tvHora.setText(i+":"+i1);
+                tvHora.setText(i + ":" + i1);
             }
         };
     }
+
 
     private class asynCliente extends AsyncTask<String, String, String> {
         @Override
@@ -252,15 +272,15 @@ public class Bienvenido extends AppCompatActivity {
                     Log.i(TAG_ACTIVITY, "--- OK  " + numeroIntentos);
                     String nombreCliente = listaClientes[0].getProperty(1).toString();
                     Oficina = listaClientes[0].getProperty(6).toString();
-                    tvB.setText("Bienvenido: " + nombreCliente + " \nEmpresa: " + Empresa + " \nOficina: " + Oficina);
+                    tvB.setText("\n Bienvenido: " + nombreCliente);
                     Toast.makeText(Bienvenido.this, " Bienvenido: " + nombreCliente + " \nOficina: " + Oficina, Toast.LENGTH_SHORT).show();
-                }else{
+                } else {
                     new AsyncSilverApp(getBaseContext()).execute();
                     new asynCliente().execute();
                 }
-            }else{
+            } else {
                 numeroIntentos++;
-                Log.i(TAG_ACTIVITY,"--- ERR  "+ numeroIntentos);
+                Log.i(TAG_ACTIVITY, "--- ERR  " + numeroIntentos);
                 if (numeroIntentos <= 1) {
                     try {
                         new AsyncSilverApp(getBaseContext()).execute();
@@ -307,12 +327,11 @@ public class Bienvenido extends AppCompatActivity {
                     Toast.makeText(getApplicationContext(), "Sin acceso a Internet", Toast.LENGTH_LONG).show();
                 //tvB.setText("Bienvenido: "+Usuarioc+" / "+Empresa);
                 //Toast.makeText(Bienvenido.this, " Empresa: " + Empresa, Toast.LENGTH_SHORT).show();
-            } else
-            {
+            } else {
                 //new Bienvenido();
                 Toast.makeText(Bienvenido.this, "Tiempo de inactividad superado.\nReconectando ...", Toast.LENGTH_SHORT).show();
                 numeroIntentos++;
-                Log.i(TAG_ACTIVITY,"--- ERR  "+ numeroIntentos);
+                Log.i(TAG_ACTIVITY, "--- ERR  " + numeroIntentos);
                 if (numeroIntentos <= 1) {
                     try {
                         new AsyncSilverApp(getBaseContext()).execute();
@@ -393,13 +412,14 @@ public class Bienvenido extends AppCompatActivity {
         }
         return Bandera;
     }
+
     public Cita[] listaCitaClientes() {
         //
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
 
         boolean Bandera = true;
-        String dato="";
+        String dato = "";
         Intent intent = getIntent();
         Bundle extras = intent.getExtras();
         if (extras != null) {
@@ -432,7 +452,8 @@ public class Bienvenido extends AppCompatActivity {
                 cita.longitud = ic.getProperty("longitud").toString();
                 cita.latitud = ic.getProperty("latitud").toString();
                 cita.cedulaVen = ic.getProperty("cedulaVen").toString();
-                cita.nombreCliente=ic.getProperty("nombreCliente").toString();
+                cita.nombreCliente = ic.getProperty("nombreCliente").toString();
+                cita.direccion = ic.getProperty("direccion").toString();
                 listaCitas[i] = cita;
             }
         } catch (Exception e) {

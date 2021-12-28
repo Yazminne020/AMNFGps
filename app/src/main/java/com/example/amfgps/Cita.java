@@ -1,18 +1,32 @@
 package com.example.amfgps;
 
+import androidx.annotation.NonNull;
+
 import org.ksoap2.serialization.KvmSerializable;
 import org.ksoap2.serialization.PropertyInfo;
 
 import java.util.Hashtable;
 
+import lombok.Data;
+
+@Data
 public class Cita implements KvmSerializable {
 
-    public String diavisita, observacion, vndr_codigo,clte_id,longitud,latitud,cedulaVen, nombreCliente;
+    public String diavisita, observacion, vndr_codigo,clte_id,longitud,latitud,cedulaVen, nombreCliente, direccion;
     public Cita() {
 
     }
 
-    public Cita(String Diavisita, String Observacion, String Vndr_codigo,String Clte_id,String Longitud,String Latitud,String CedulaVen, String NombreCliente) {
+//    @NonNull
+//    @Override
+//    public String toString() {
+//        if (!clte_id.isEmpty()) {
+//            return " " + clte_id + "-" + nombreCliente
+//                    + "\n" + direccion;
+//        }
+//        return "-";
+//    }
+    public Cita(String Diavisita, String Observacion, String Vndr_codigo,String Clte_id,String Longitud,String Latitud,String CedulaVen, String NombreCliente, String Direccion) {
         this.diavisita = Diavisita;
         this.observacion = Observacion;
         this.vndr_codigo = Vndr_codigo;
@@ -21,6 +35,7 @@ public class Cita implements KvmSerializable {
         this.latitud = Latitud;
         this.cedulaVen = CedulaVen;
         this.nombreCliente=NombreCliente;
+        this.direccion=direccion;
     }
 
     @Override
@@ -42,13 +57,15 @@ public class Cita implements KvmSerializable {
                 return cedulaVen;
             case 7:
                 return nombreCliente;
+            case 8:
+                return direccion;
         }
         return null;
     }
 
     @Override
     public int getPropertyCount() {
-        return 8;
+        return 9;
     }
 
     @Override
@@ -77,6 +94,9 @@ public class Cita implements KvmSerializable {
                 break;
             case 7:
                 nombreCliente = val.toString();
+                break;
+            case 8:
+                direccion = val.toString();
                 break;
             default:
                 break;
@@ -117,6 +137,10 @@ public class Cita implements KvmSerializable {
             case 7:
                 info.type = PropertyInfo.STRING_CLASS;
                 info.name = "nombreCliente";
+                break;
+            case 8:
+                info.type = PropertyInfo.STRING_CLASS;
+                info.name = "direccion";
                 break;
             default:
                 break;

@@ -6,78 +6,69 @@
     android:layout_height="match_parent"
     tools:context=".Bienvenido">
 
-    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-        android:id="@+id/swipeRefreshLayout"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
-    <ScrollView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/tvUsuario"
+            android:layout_width="match_parent"
+            android:layout_height="69dp"
+            android:drawableLeft="@drawable/usernts"
+            android:text="Bienvenido:"
+            android:textAppearance="@style/TextAppearance.AppCompat.Widget.ActionMode.Subtitle"
+            android:textColor="@android:color/background_dark" />
+
+        <Button
+            android:id="@+id/btnUbicacion"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Tomar Ubicación Actual" />
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <TextView
-                android:id="@+id/tvUsuario"
-                android:layout_width="match_parent"
-                android:layout_height="69dp"
-                android:drawableLeft="@drawable/usernts"
-                android:text="Bienvenido:"
-                android:textAppearance="@style/TextAppearance.AppCompat.Widget.ActionMode.Subtitle"
-                android:textColor="@android:color/background_dark" />
-
-            <Button
-                android:id="@+id/btnUbicacion"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Tomar Ubicación Actual" />
-
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical">
+                android:orientation="horizontal">
 
-                <LinearLayout
-                    android:layout_width="match_parent"
+                <EditText
+                    android:id="@+id/etFechaDesdeDialog"
+                    android:layout_width="142dp"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal">
+                    android:layout_weight="1"
+                    android:autofillHints="01/01/2000"
+                    android:hint="@string/fecha_desde"
+                    android:inputType="date"
+                    tools:targetApi="o" />
 
-                    <EditText
-                        android:id="@+id/etFechaDesdeDialog"
-                        android:layout_width="142dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:autofillHints="01/01/2000"
-                        android:hint="@string/fecha_desde"
-                        android:inputType="date"
-                        tools:targetApi="o" />
-
-                    <ImageButton
-                        android:id="@+id/btnFechaDesdeDialog"
-                        android:layout_width="45dp"
-                        android:layout_height="45dp"
-                        android:background="@drawable/calendar" />
-
-                </LinearLayout>
+                <ImageButton
+                    android:id="@+id/btnFechaDesdeDialog"
+                    android:layout_width="45dp"
+                    android:layout_height="45dp"
+                    android:background="@drawable/calendar" />
 
             </LinearLayout>
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:orientation="vertical">
-
-                <ListView
-                    android:id="@+id/lvCitas"
-                    android:layout_width="match_parent"
-                    android:layout_height="572dp">
-
-                </ListView>
-            </LinearLayout>
         </LinearLayout>
-    </ScrollView>
-    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <ListView
+                android:id="@+id/lvCitas"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+            </ListView>
+        </LinearLayout>
+    </LinearLayout>
+
 </RelativeLayout>
