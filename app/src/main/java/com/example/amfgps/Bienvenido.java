@@ -26,6 +26,7 @@ import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.StrictMode;
+import android.provider.Settings;
 import android.text.InputType;
 import android.util.Log;
 import android.view.View;
@@ -50,10 +51,13 @@ import org.ksoap2.transport.HttpTransportSE;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 
-public class Bienvenido extends AppCompatActivity{
+public class Bienvenido extends AppCompatActivity implements CitaAdapter.customButtonListener {
 
     TextView tvFecha, tvB, tvHora;
     Button btnUbicacion;
@@ -66,16 +70,20 @@ public class Bienvenido extends AppCompatActivity{
     public String TAG_ACTIVITY = "Bienvenido";
     private String Oficina, Empresa;
     private Cliente[] listaClientes;
-    private Cita[] listaCitas;
+    private Cita[] listaCitas, auxiliar,citas,auxiliar1;
     ListView listViewPedido;
     CitaAdapter adapterp1;
-    Context context = this;
+    ArrayList<Cita> names = new ArrayList<Cita>();
+    ArrayList<Cita> names1 = new ArrayList<Cita>();
+    String val = "";
 
     @SuppressLint("WrongViewCast")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_bienvenido);
+
+
         tvFecha = findViewById(R.id.etFechaDesdeDialog);
 //        tvHora = findViewById(R.id.etHora);
         btnUbicacion = findViewById(R.id.btnUbicacion);
@@ -98,7 +106,6 @@ public class Bienvenido extends AppCompatActivity{
         tomarUbicacion();
 
 
-        //swipeRefreshLayout = findViewById(R.id.swipeRefreshLayout);
         tvB = findViewById(R.id.tvUsuario);
         //nombre de empresa
         Empresa = "";
@@ -117,16 +124,13 @@ public class Bienvenido extends AppCompatActivity{
             g.setUsuario(dato);
             g.setClave(datoc);
             g.setEmpresa(d2);
-            if (Network.compruebaConexion(getApplicationContext()))
+            if (Network.compruebaConexion(getApplicationContext())) {
                 new asyntodos().execute();
+                new asyncitaClientes().execute();
+            }
             else
                 Toast.makeText(getApplicationContext(), "Sin acceso a Internet", Toast.LENGTH_LONG).show();
         }
-
-//        swipeRefreshLayout.setOnRefreshListener(() -> {
-//            Toast.makeText(getApplicationContext(), "...", Toast.LENGTH_LONG);
-//            new asynCliente().execute();
-//        });
 
 
         ImageButton button = (ImageButton) findViewById(R.id.btnFechaDesdeDialog);
@@ -137,20 +141,10 @@ public class Bienvenido extends AppCompatActivity{
             }
         });
 
-        ArrayList<Cita> names = new ArrayList<Cita>();
-        Cita[] citas = listaCitaClientes();
-        for (int i = 0; i < citas.length; i++) {
 
-            names.add(citas[i]);
-        }
-        if (listaCitas != null) {
-//            adapterp1 = new ArrayAdapter(context, android.R.layout.simple_list_item_1, names);
-//            listViewPedido.setAdapter(adapterp1);
-            adapterp1 = new CitaAdapter(Bienvenido.this, R.layout.lista_cita_cliente, names);
-            listViewPedido.setAdapter(adapterp1);
-            //ACTIVAR DAR CLICK EN BOTON.
-            //adapterp1.setCustomButtonListner(Bienvenido.this);
-        }
+       //citas = listaCitaClientes();
+
+
 
 //        SimpleDateFormat sdf1 = new SimpleDateFormat("HH:mm");// /dd/MM/yyyy HH:mm:ss"/
 //        tvHora.setText(sdf1.format(c.getTime()));
@@ -160,6 +154,7 @@ public class Bienvenido extends AppCompatActivity{
 
 
     }
+
 
     private void tomarUbicacion() {
         int permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION);
@@ -180,7 +175,18 @@ public class Bienvenido extends AppCompatActivity{
                 LocationListener locationListener = new LocationListener() {
                     @Override
                     public void onLocationChanged(@NonNull Location location) {
-                        String val = location.getLatitude() + "  " + location.getLongitude();
+                        val = location.getLatitude() + "  " + location.getLongitude();
+                        auxiliar1 = controlDistancia(val, citas);
+                        if (auxiliar != null) {
+                            for (int i = 0; i < auxiliar.length; i++) {
+
+                                names.add(auxiliar[i]);
+                            }
+                            adapterp1 = new CitaAdapter(Bienvenido.this, R.layout.lista_cita_cliente, names);
+                            listViewPedido.setAdapter(adapterp1);
+
+                        }
+
                     }
 
                     @Override
@@ -189,6 +195,15 @@ public class Bienvenido extends AppCompatActivity{
                 };
                 int permissionCheck = ContextCompat.checkSelfPermission(Bienvenido.this, Manifest.permission.ACCESS_FINE_LOCATION);
                 locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, locationListener);
+                if (auxiliar1 != null) {
+                    for (int i = 0; i < auxiliar1.length; i++) {
+
+                        names1.add(auxiliar1[i]);
+                    }
+                    adapterp1 = new CitaAdapter(Bienvenido.this, R.layout.lista_cita_cliente, names1);
+                    listViewPedido.setAdapter(adapterp1);
+
+                }
             }
         });
 
@@ -235,6 +250,10 @@ public class Bienvenido extends AppCompatActivity{
         };
     }
 
+    @Override
+    public void onButtonClickListner(int position, Cita value, String boton) {
+
+    }
 
     private class asynCliente extends AsyncTask<String, String, String> {
         @Override
@@ -274,6 +293,7 @@ public class Bienvenido extends AppCompatActivity{
                     Oficina = listaClientes[0].getProperty(6).toString();
                     tvB.setText("\n Bienvenido: " + nombreCliente);
                     Toast.makeText(Bienvenido.this, " Bienvenido: " + nombreCliente + " \nOficina: " + Oficina, Toast.LENGTH_SHORT).show();
+
                 } else {
                     new AsyncSilverApp(getBaseContext()).execute();
                     new asynCliente().execute();
@@ -294,6 +314,7 @@ public class Bienvenido extends AppCompatActivity{
                     Toast.makeText(Bienvenido.this, "Ocurrió un error. Intente nuevamente...", Toast.LENGTH_SHORT).show();
                 }
             }
+
         }
     }
 
@@ -319,6 +340,7 @@ public class Bienvenido extends AppCompatActivity{
         protected void onPostExecute(String s) {
             dialogo.dismiss();
             if (s.equals("ok")) {
+
                 //cargar datos
                 Log.i(TAG_ACTIVITY, "--- OK  " + numeroIntentos);
                 if (Network.compruebaConexion(getApplicationContext()))
@@ -348,6 +370,79 @@ public class Bienvenido extends AppCompatActivity{
         }
     }
 
+    private class asyncitaClientes extends AsyncTask<String, String, String> {
+        @Override
+        protected void onPreExecute() {
+//            dialogo = new ProgressDialog(Bienvenido.this);
+//            dialogo.setMessage("Cargado datos...");
+//            dialogo.setIndeterminate(false);
+//            dialogo.setCancelable(false);
+//            dialogo.show();
+        }
+
+        @Override
+        protected String doInBackground(String... params) {
+            if (listaCitaClientes())
+                return "ok";
+            else
+                return "err";
+        }
+
+        @Override
+        protected void onPostExecute(String s) {
+            dialogo.dismiss();
+            if (s.equals("ok")) {
+                citas =listaCitas;
+                LocationManager locationManager = (LocationManager) Bienvenido.this.getSystemService(Context.LOCATION_SERVICE);
+
+                LocationListener locationListener = new LocationListener() {
+                    @Override
+
+                    public void onLocationChanged(@NonNull Location location) {
+                        val = location.getLatitude() + "  " + location.getLongitude();
+                        auxiliar = controlDistancia(val, citas);
+                        names=new ArrayList<>();
+                        if (auxiliar != null) {
+                            for (int i = 0; i < auxiliar.length; i++) {
+
+                                names.add(auxiliar[i]);
+                            }
+                            adapterp1 = new CitaAdapter(Bienvenido.this, R.layout.lista_cita_cliente, names);
+                            listViewPedido.setAdapter(adapterp1);
+
+                        }
+                    }
+
+                    @Override
+                    public void onStatusChanged(String provider, int status, Bundle extras) {
+
+                    }
+                };
+
+                ContextCompat.checkSelfPermission(Bienvenido.this, Manifest.permission.ACCESS_FINE_LOCATION);
+                locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, locationListener);
+                //cargar datos
+
+            } else {
+                //new Bienvenido();
+                Toast.makeText(Bienvenido.this, "Tiempo de inactividad superado.\nReconectando ...", Toast.LENGTH_SHORT).show();
+                numeroIntentos++;
+                Log.i(TAG_ACTIVITY, "--- ERR  " + numeroIntentos);
+                if (numeroIntentos <= 1) {
+                    try {
+                        new AsyncSilverApp(getBaseContext()).execute();
+                        new asyntodos().execute();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        Toast.makeText(Bienvenido.this, "Ha ocurrido un error de conexión. \nConsulte con el administrador...", Toast.LENGTH_SHORT).show();
+                    }
+                } else {
+                    numeroIntentos = 0;
+                    Toast.makeText(Bienvenido.this, "Ocurrió un error. Intente nuevamente...", Toast.LENGTH_SHORT).show();
+                }
+            }
+        }
+    }
     //LLAMA A DATOS DE CLIENTE
     public Boolean llamarCliente() {
         //
@@ -385,6 +480,77 @@ public class Bienvenido extends AppCompatActivity{
         return Bandera;
     }
 
+    public Cita[] controlDistancia(String origen, Cita[] citaClientes) {  //latitude, logitude
+        String[] valores = new String[citaClientes.length];
+        float[] val = new float[valores.length];
+        float[] list = new float[valores.length];
+        Location locationA = new Location("punto A");
+        Location locationB = new Location("punto B");
+        String latA = origen.split(" ")[0];
+        String lngA = origen.split(" ")[2];
+
+        locationA.setLatitude(Double.parseDouble(latA));
+        locationA.setLongitude(Double.parseDouble(lngA));
+
+        for (int i = 0; i < citaClientes.length; i++) {
+            locationB.setLatitude(Double.parseDouble(citaClientes[i].latitud));
+            locationB.setLongitude(Double.parseDouble(citaClientes[i].longitud));
+            float distance = locationA.distanceTo(locationB);
+            valores[i] = (citaClientes[i].clte_id + "-" + distance);
+        }
+        for (int x = 0; x < valores.length; x++) {
+            val[x] = Float.parseFloat(valores[x].split("-")[1]);
+        }
+        float[] val1 = Arrays.copyOf(val, val.length);
+        list = optimizedBubbleSort(val);
+        String[] orden = orden(val1, list, valores);
+        Cita[] cita = ordenClientes(orden, citaClientes);
+
+        return cita;
+        //System.out.println(val);
+    }
+
+    private String[] orden(float[] val, float[] list, String[] valores) {
+        String[] aux = new String[val.length];
+        for (int i = 0; i < list.length; i++) {
+            for (int x = 0; x < val.length; x++) {
+                if (list[i] == val[x]) {
+                    aux[i] = valores[x];
+                }
+            }
+        }
+        return aux;
+    }
+
+    private Cita[] ordenClientes(String[] orden, Cita[] citaClientes) {
+        Cita[] aux = new Cita[orden.length];
+        for (int i = 0; i < orden.length; i++) {
+            for (int x = 0; x < citaClientes.length; x++) {
+                String a = orden[i].split("-")[0];
+                if (a.equals(citaClientes[x].clte_id)) {
+                    aux[i] = citaClientes[x];
+                    break;
+                }
+            }
+        }
+        return aux;
+    }
+
+    private float[] optimizedBubbleSort(float[] list) {
+        float aux;
+
+        for (int i = 0; i < list.length - 1; i++) {
+            for (int x = i + 1; x < list.length; x++) {
+                if (list[x] < list[i]) {
+                    aux = list[i];
+                    list[i] = list[x];
+                    list[x] = aux;
+                }
+            }
+        }
+        return list;
+    }
+
     public Boolean llamarWS() {
         //
 
@@ -413,7 +579,7 @@ public class Bienvenido extends AppCompatActivity{
         return Bandera;
     }
 
-    public Cita[] listaCitaClientes() {
+    public Boolean listaCitaClientes() {
         //
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
@@ -459,8 +625,8 @@ public class Bienvenido extends AppCompatActivity{
         } catch (Exception e) {
             //Print error
             e.printStackTrace();
-            return null;
+            Bandera = false;
         }
-        return listaCitas;
+        return Bandera;
     }
 }

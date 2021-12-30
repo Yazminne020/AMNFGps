@@ -21,7 +21,7 @@ public class CitaAdapter extends ArrayAdapter<Cita> {
     customButtonListener customListner;
 
     public interface customButtonListener {
-        public void onButtonClickListner(int position, String value, String boton);
+        public void onButtonClickListner(int position, Cita value, String boton);
     }
 
     public void setCustomButtonListner(customButtonListener listener) {
@@ -38,6 +38,7 @@ public class CitaAdapter extends ArrayAdapter<Cita> {
     @SuppressLint("WrongViewCast")
     public View getView(final int position, View convertView, ViewGroup parent) {
 //        return super.getView(position, convertView, parent);
+        Cita infoC=getItem(position);
         String diavisita = getItem(position).diavisita;
         String observacion = getItem(position).observacion;
         String vndr_codigo = getItem(position).vndr_codigo;
@@ -51,17 +52,17 @@ public class CitaAdapter extends ArrayAdapter<Cita> {
         //ArticuloPedidos lp = new ArticuloPedidos(idPedido, nombreart, cantidad, punitario, total, cantpro, arti);
         LayoutInflater inlfater = LayoutInflater.from(mcontext);
         convertView = inlfater.inflate(mResource, parent, false);
-        ImageButton btEliminari = (ImageButton) convertView.findViewById(R.id.btnVerLista);//eliminar item
+        ImageButton btVerDetalleCliente = (ImageButton) convertView.findViewById(R.id.btnVerLista);//eliminar item
         TextView tvNombreLista = (TextView) convertView.findViewById(R.id.tvNombreLista);
         TextView tvDireccionLista = (TextView) convertView.findViewById(R.id.tvDireccionLista);
 
         tvNombreLista.setText(nombreCliente);
         tvDireccionLista.setText(direccion);
 
-        btEliminari.setOnClickListener(new View.OnClickListener() {
+        btVerDetalleCliente.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 if (customListner != null) {
-                    customListner.onButtonClickListner(position, clte_id.toString(), "CONTINUAR");
+                    customListner.onButtonClickListner(position, infoC, "CONTINUAR");
                 }
             }
         });
