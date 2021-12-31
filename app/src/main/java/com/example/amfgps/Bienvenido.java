@@ -1,6 +1,7 @@
 package com.example.amfgps;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
@@ -20,20 +21,27 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.location.Address;
+import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.location.LocationProvider;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Looper;
 import android.os.StrictMode;
 import android.provider.Settings;
+import android.text.Editable;
 import android.text.InputType;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.DatePicker;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -41,6 +49,10 @@ import android.widget.TimePicker;
 import android.widget.Toast;
 
 import com.example.amfgps.utilities.Network;
+import com.google.android.gms.location.LocationCallback;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
+import com.google.android.gms.location.LocationServices;
 
 import org.ksoap2.SoapEnvelope;
 import org.ksoap2.serialization.MarshalBase64;
@@ -49,6 +61,7 @@ import org.ksoap2.serialization.SoapPrimitive;
 import org.ksoap2.serialization.SoapSerializationEnvelope;
 import org.ksoap2.transport.HttpTransportSE;
 
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -56,10 +69,12 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.List;
+import java.util.Locale;
 
 public class Bienvenido extends AppCompatActivity implements CitaAdapter.customButtonListener {
 
-    TextView tvFecha, tvB, tvHora;
+    TextView tvFecha, tvB, tvHora, tvlocalizacion;
     Button btnUbicacion;
     private String _usuario, Usuarioc, empresac, Clave;
     private ProgressDialog dialogo;
@@ -76,6 +91,7 @@ public class Bienvenido extends AppCompatActivity implements CitaAdapter.customB
     ArrayList<Cita> names = new ArrayList<Cita>();
     ArrayList<Cita> names1 = new ArrayList<Cita>();
     String val = "";
+    double latitud1,longitude1;
 
     @SuppressLint("WrongViewCast")
     @Override
@@ -85,6 +101,7 @@ public class Bienvenido extends AppCompatActivity implements CitaAdapter.customB
 
 
         tvFecha = findViewById(R.id.etFechaDesdeDialog);
+        tvlocalizacion= findViewById(R.id.tvLocalizacion);
 //        tvHora = findViewById(R.id.etHora);
         btnUbicacion = findViewById(R.id.btnUbicacion);
         tvB = findViewById(R.id.tvUsuario);
@@ -103,8 +120,16 @@ public class Bienvenido extends AppCompatActivity implements CitaAdapter.customB
         tvFecha.setInputType(InputType.TYPE_NULL);
 
         tomarFecha(year, month, day);
-        tomarUbicacion();
+        //tomarUbicacion();
+//Permiso GPS
+        int permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION);
+        if (permissionCheck == PackageManager.PERMISSION_DENIED) {
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_FINE_LOCATION)) {
 
+            } else {
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
+            }
+        }
 
         tvB = findViewById(R.id.tvUsuario);
         //nombre de empresa
@@ -126,7 +151,7 @@ public class Bienvenido extends AppCompatActivity implements CitaAdapter.customB
             g.setEmpresa(d2);
             if (Network.compruebaConexion(getApplicationContext())) {
                 new asyntodos().execute();
-                new asyncitaClientes().execute();
+                //new asyncitaClientes().execute();
             }
             else
                 Toast.makeText(getApplicationContext(), "Sin acceso a Internet", Toast.LENGTH_LONG).show();
@@ -142,72 +167,104 @@ public class Bienvenido extends AppCompatActivity implements CitaAdapter.customB
         });
 
 
-       //citas = listaCitaClientes();
+        if (ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED)
+        {
+            ActivityCompat.requestPermissions(Bienvenido.this,new String[]{Manifest.permission.ACCESS_FINE_LOCATION},1);
+        } else {
 
+            getCoordenada();
 
-
-//        SimpleDateFormat sdf1 = new SimpleDateFormat("HH:mm");// /dd/MM/yyyy HH:mm:ss"/
-//        tvHora.setText(sdf1.format(c.getTime()));
-//        tvHora.setInputType(InputType.TYPE_NULL);
-//
-//        tomarHora(hour, min);
-
-
-    }
-
-
-    private void tomarUbicacion() {
-        int permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION);
-        if (permissionCheck == PackageManager.PERMISSION_DENIED) {
-            if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_FINE_LOCATION)) {
-
-            } else {
-                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
-            }
         }
 
-        btnUbicacion.setOnClickListener(new View.OnClickListener() {
-            @SuppressLint("MissingPermission")
+
+        tvlocalizacion.addTextChangedListener(new TextWatcher() {
             @Override
-            public void onClick(View view) {
-                LocationManager locationManager = (LocationManager) Bienvenido.this.getSystemService(Context.LOCATION_SERVICE);
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                //System.out.println(s.toString() + " " + start + " " + count + " " + after);
 
-                LocationListener locationListener = new LocationListener() {
-                    @Override
-                    public void onLocationChanged(@NonNull Location location) {
-                        val = location.getLatitude() + "  " + location.getLongitude();
-                        auxiliar1 = controlDistancia(val, citas);
-                        if (auxiliar != null) {
-                            for (int i = 0; i < auxiliar.length; i++) {
+            }
 
-                                names.add(auxiliar[i]);
-                            }
-                            adapterp1 = new CitaAdapter(Bienvenido.this, R.layout.lista_cita_cliente, names);
-                            listViewPedido.setAdapter(adapterp1);
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+               // System.out.println(s.toString() + " " + start + " " + count);
+                citas =listaCitaClientes();
+                val = tvlocalizacion.getText().toString();
+                auxiliar = controlDistancia(val, citas);
+                if (auxiliar != null) {
+                    for (int i = 0; i < auxiliar.length; i++) {
 
-                        }
-
+                        names.add(auxiliar[i]);
                     }
-
-                    @Override
-                    public void onStatusChanged(String provider, int status, Bundle extras) {
-                    }
-                };
-                int permissionCheck = ContextCompat.checkSelfPermission(Bienvenido.this, Manifest.permission.ACCESS_FINE_LOCATION);
-                locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, locationListener);
-                if (auxiliar1 != null) {
-                    for (int i = 0; i < auxiliar1.length; i++) {
-
-                        names1.add(auxiliar1[i]);
-                    }
-                    adapterp1 = new CitaAdapter(Bienvenido.this, R.layout.lista_cita_cliente, names1);
+                    adapterp1 = new CitaAdapter(Bienvenido.this, R.layout.lista_cita_cliente, names);
                     listViewPedido.setAdapter(adapterp1);
-
                 }
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+               // System.out.println(s.toString());
             }
         });
-
     }
+
+
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == 1 && grantResults.length > 0) {
+            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                getCoordenada();
+            } else {
+                Toast.makeText(this, "Permiso Denegado ..", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+    private void getCoordenada() {
+
+        try {
+            LocationRequest locationRequest = new LocationRequest();
+            locationRequest.setInterval(10000);
+            locationRequest.setFastestInterval(3000);
+            locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+
+                return;
+            }
+            LocationServices.getFusedLocationProviderClient(this).requestLocationUpdates(locationRequest, new LocationCallback() {
+                @SuppressLint("MissingPermission")
+                @Override
+                public void onLocationResult(LocationResult locationResult) {
+                    super.onLocationResult(locationResult);
+                    LocationServices.getFusedLocationProviderClient(Bienvenido.this).removeLocationUpdates(this);
+                    if (locationResult != null && locationResult.getLocations().size() > 0) {
+                        int latestLocationIndex = locationResult.getLocations().size() - 1;
+                         latitud1 = locationResult.getLocations().get(latestLocationIndex).getLatitude();
+                         longitude1 = locationResult.getLocations().get(latestLocationIndex).getLongitude();
+                        tvlocalizacion.setText(latitud1+" "+longitude1);
+                    }
+
+                }
+
+            }, Looper.myLooper());
+
+        }catch (Exception ex){
+            System.out.println("Error es :" + ex);
+        }
+    }
+    public void ObtenerCoordendasActual(View view) {
+
+
+        if (ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED)
+        {
+            ActivityCompat.requestPermissions(Bienvenido.this,new String[]{Manifest.permission.ACCESS_FINE_LOCATION},1);
+        } else {
+
+            getCoordenada();
+        }
+    }
+
 
     private void tomarFecha(int year, int month, int day) {
         tvFecha.setOnClickListener(new View.OnClickListener() {
@@ -292,8 +349,7 @@ public class Bienvenido extends AppCompatActivity implements CitaAdapter.customB
                     String nombreCliente = listaClientes[0].getProperty(1).toString();
                     Oficina = listaClientes[0].getProperty(6).toString();
                     tvB.setText("\n Bienvenido: " + nombreCliente);
-                    Toast.makeText(Bienvenido.this, " Bienvenido: " + nombreCliente + " \nOficina: " + Oficina, Toast.LENGTH_SHORT).show();
-
+                    Toast.makeText(Bienvenido.this, " Bienvenido: " + nombreCliente, Toast.LENGTH_SHORT).show();
                 } else {
                     new AsyncSilverApp(getBaseContext()).execute();
                     new asynCliente().execute();
@@ -370,79 +426,7 @@ public class Bienvenido extends AppCompatActivity implements CitaAdapter.customB
         }
     }
 
-    private class asyncitaClientes extends AsyncTask<String, String, String> {
-        @Override
-        protected void onPreExecute() {
-//            dialogo = new ProgressDialog(Bienvenido.this);
-//            dialogo.setMessage("Cargado datos...");
-//            dialogo.setIndeterminate(false);
-//            dialogo.setCancelable(false);
-//            dialogo.show();
-        }
 
-        @Override
-        protected String doInBackground(String... params) {
-            if (listaCitaClientes())
-                return "ok";
-            else
-                return "err";
-        }
-
-        @Override
-        protected void onPostExecute(String s) {
-            dialogo.dismiss();
-            if (s.equals("ok")) {
-                citas =listaCitas;
-                LocationManager locationManager = (LocationManager) Bienvenido.this.getSystemService(Context.LOCATION_SERVICE);
-
-                LocationListener locationListener = new LocationListener() {
-                    @Override
-
-                    public void onLocationChanged(@NonNull Location location) {
-                        val = location.getLatitude() + "  " + location.getLongitude();
-                        auxiliar = controlDistancia(val, citas);
-                        names=new ArrayList<>();
-                        if (auxiliar != null) {
-                            for (int i = 0; i < auxiliar.length; i++) {
-
-                                names.add(auxiliar[i]);
-                            }
-                            adapterp1 = new CitaAdapter(Bienvenido.this, R.layout.lista_cita_cliente, names);
-                            listViewPedido.setAdapter(adapterp1);
-
-                        }
-                    }
-
-                    @Override
-                    public void onStatusChanged(String provider, int status, Bundle extras) {
-
-                    }
-                };
-
-                ContextCompat.checkSelfPermission(Bienvenido.this, Manifest.permission.ACCESS_FINE_LOCATION);
-                locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, locationListener);
-                //cargar datos
-
-            } else {
-                //new Bienvenido();
-                Toast.makeText(Bienvenido.this, "Tiempo de inactividad superado.\nReconectando ...", Toast.LENGTH_SHORT).show();
-                numeroIntentos++;
-                Log.i(TAG_ACTIVITY, "--- ERR  " + numeroIntentos);
-                if (numeroIntentos <= 1) {
-                    try {
-                        new AsyncSilverApp(getBaseContext()).execute();
-                        new asyntodos().execute();
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                        Toast.makeText(Bienvenido.this, "Ha ocurrido un error de conexión. \nConsulte con el administrador...", Toast.LENGTH_SHORT).show();
-                    }
-                } else {
-                    numeroIntentos = 0;
-                    Toast.makeText(Bienvenido.this, "Ocurrió un error. Intente nuevamente...", Toast.LENGTH_SHORT).show();
-                }
-            }
-        }
-    }
     //LLAMA A DATOS DE CLIENTE
     public Boolean llamarCliente() {
         //
@@ -487,7 +471,7 @@ public class Bienvenido extends AppCompatActivity implements CitaAdapter.customB
         Location locationA = new Location("punto A");
         Location locationB = new Location("punto B");
         String latA = origen.split(" ")[0];
-        String lngA = origen.split(" ")[2];
+        String lngA = origen.split(" ")[1];
 
         locationA.setLatitude(Double.parseDouble(latA));
         locationA.setLongitude(Double.parseDouble(lngA));
@@ -579,7 +563,7 @@ public class Bienvenido extends AppCompatActivity implements CitaAdapter.customB
         return Bandera;
     }
 
-    public Boolean listaCitaClientes() {
+    public Cita[] listaCitaClientes() {
         //
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
@@ -627,6 +611,6 @@ public class Bienvenido extends AppCompatActivity implements CitaAdapter.customB
             e.printStackTrace();
             Bandera = false;
         }
-        return Bandera;
+        return listaCitas;
     }
 }

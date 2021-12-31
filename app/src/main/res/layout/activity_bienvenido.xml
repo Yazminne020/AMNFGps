@@ -24,12 +24,19 @@
             android:id="@+id/btnUbicacion"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:onClick="ObtenerCoordendasActual"
             android:text="Tomar Ubicación Actual" />
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tvLocalizacion"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Localización" />
 
             <LinearLayout
                 android:layout_width="match_parent"
