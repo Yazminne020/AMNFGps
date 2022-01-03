@@ -187,17 +187,23 @@ public class Bienvenido extends AppCompatActivity implements CitaAdapter.customB
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                // System.out.println(s.toString() + " " + start + " " + count);
-                citas =listaCitaClientes();
-                val = tvlocalizacion.getText().toString();
-                auxiliar = controlDistancia(val, citas);
-                if (auxiliar != null) {
-                    for (int i = 0; i < auxiliar.length; i++) {
+                if(tvlocalizacion.getText().toString().isEmpty()){
 
-                        names.add(auxiliar[i]);
+                }else {
+                    citas =listaCitaClientes();
+                    val = tvlocalizacion.getText().toString();
+                    auxiliar = controlDistancia(val, citas);
+                    if (auxiliar != null) {
+                        for (int i = 0; i < auxiliar.length; i++) {
+
+                            names.add(auxiliar[i]);
+                        }
+                        adapterp1 = new CitaAdapter(Bienvenido.this, R.layout.lista_cita_cliente, names);
+                        listViewPedido.setAdapter(adapterp1);
+                        adapterp1.setCustomButtonListner(Bienvenido.this);
                     }
-                    adapterp1 = new CitaAdapter(Bienvenido.this, R.layout.lista_cita_cliente, names);
-                    listViewPedido.setAdapter(adapterp1);
                 }
+
 
             }
 
@@ -308,7 +314,11 @@ public class Bienvenido extends AppCompatActivity implements CitaAdapter.customB
     }
 
     @Override
-    public void onButtonClickListner(int position, Cita value, String boton) {
+    public void onButtonClickListner(String position, Cita value, String boton) {
+        //int Position=position;
+//        if (boton.equals("CONTINUAR")){
+            String Position=position;
+//        }
 
     }
 

@@ -21,7 +21,7 @@ public class CitaAdapter extends ArrayAdapter<Cita> {
     customButtonListener customListner;
 
     public interface customButtonListener {
-        public void onButtonClickListner(int position, Cita value, String boton);
+        public void onButtonClickListner(String position, Cita value, String boton);
     }
 
     public void setCustomButtonListner(customButtonListener listener) {
@@ -62,7 +62,7 @@ public class CitaAdapter extends ArrayAdapter<Cita> {
         btVerDetalleCliente.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 if (customListner != null) {
-                    customListner.onButtonClickListner(position, infoC, "CONTINUAR");
+                    customListner.onButtonClickListner(clte_id, infoC, "CONTINUAR");
                 }
             }
         });
