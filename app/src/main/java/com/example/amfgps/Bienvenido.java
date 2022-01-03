@@ -85,13 +85,13 @@ public class Bienvenido extends AppCompatActivity implements CitaAdapter.customB
     public String TAG_ACTIVITY = "Bienvenido";
     private String Oficina, Empresa;
     private Cliente[] listaClientes;
-    private Cita[] listaCitas, auxiliar,citas,auxiliar1;
+    private Cita[] listaCitas, auxiliar, citas, auxiliar1;
     ListView listViewPedido;
     CitaAdapter adapterp1;
     ArrayList<Cita> names = new ArrayList<Cita>();
     ArrayList<Cita> names1 = new ArrayList<Cita>();
     String val = "";
-    double latitud1,longitude1;
+    double latitud1, longitude1;
 
     @SuppressLint("WrongViewCast")
     @Override
@@ -101,7 +101,7 @@ public class Bienvenido extends AppCompatActivity implements CitaAdapter.customB
 
 
         tvFecha = findViewById(R.id.etFechaDesdeDialog);
-        tvlocalizacion= findViewById(R.id.tvLocalizacion);
+        tvlocalizacion = findViewById(R.id.tvLocalizacion);
 //        tvHora = findViewById(R.id.etHora);
         btnUbicacion = findViewById(R.id.btnUbicacion);
         tvB = findViewById(R.id.tvUsuario);
@@ -152,8 +152,7 @@ public class Bienvenido extends AppCompatActivity implements CitaAdapter.customB
             if (Network.compruebaConexion(getApplicationContext())) {
                 new asyntodos().execute();
                 //new asyncitaClientes().execute();
-            }
-            else
+            } else
                 Toast.makeText(getApplicationContext(), "Sin acceso a Internet", Toast.LENGTH_LONG).show();
         }
 
@@ -167,9 +166,8 @@ public class Bienvenido extends AppCompatActivity implements CitaAdapter.customB
         });
 
 
-        if (ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED)
-        {
-            ActivityCompat.requestPermissions(Bienvenido.this,new String[]{Manifest.permission.ACCESS_FINE_LOCATION},1);
+        if (ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(Bienvenido.this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
         } else {
 
             getCoordenada();
@@ -186,11 +184,11 @@ public class Bienvenido extends AppCompatActivity implements CitaAdapter.customB
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-               // System.out.println(s.toString() + " " + start + " " + count);
-                if(tvlocalizacion.getText().toString().isEmpty()){
+                // System.out.println(s.toString() + " " + start + " " + count);
+                if (tvlocalizacion.getText().toString().isEmpty()) {
 
-                }else {
-                    citas =listaCitaClientes();
+                } else {
+                    citas = listaCitaClientes();
                     val = tvlocalizacion.getText().toString();
                     auxiliar = controlDistancia(val, citas);
                     if (auxiliar != null) {
@@ -209,11 +207,10 @@ public class Bienvenido extends AppCompatActivity implements CitaAdapter.customB
 
             @Override
             public void afterTextChanged(Editable s) {
-               // System.out.println(s.toString());
+                // System.out.println(s.toString());
             }
         });
     }
-
 
 
     @Override
@@ -227,6 +224,7 @@ public class Bienvenido extends AppCompatActivity implements CitaAdapter.customB
             }
         }
     }
+
     private void getCoordenada() {
 
         try {
@@ -246,25 +244,25 @@ public class Bienvenido extends AppCompatActivity implements CitaAdapter.customB
                     LocationServices.getFusedLocationProviderClient(Bienvenido.this).removeLocationUpdates(this);
                     if (locationResult != null && locationResult.getLocations().size() > 0) {
                         int latestLocationIndex = locationResult.getLocations().size() - 1;
-                         latitud1 = locationResult.getLocations().get(latestLocationIndex).getLatitude();
-                         longitude1 = locationResult.getLocations().get(latestLocationIndex).getLongitude();
-                        tvlocalizacion.setText(latitud1+" "+longitude1);
+                        latitud1 = locationResult.getLocations().get(latestLocationIndex).getLatitude();
+                        longitude1 = locationResult.getLocations().get(latestLocationIndex).getLongitude();
+                        tvlocalizacion.setText(latitud1 + " " + longitude1);
                     }
 
                 }
 
             }, Looper.myLooper());
 
-        }catch (Exception ex){
+        } catch (Exception ex) {
             System.out.println("Error es :" + ex);
         }
     }
+
     public void ObtenerCoordendasActual(View view) {
 
 
-        if (ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED)
-        {
-            ActivityCompat.requestPermissions(Bienvenido.this,new String[]{Manifest.permission.ACCESS_FINE_LOCATION},1);
+        if (ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(Bienvenido.this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
         } else {
 
             getCoordenada();
@@ -316,9 +314,21 @@ public class Bienvenido extends AppCompatActivity implements CitaAdapter.customB
     @Override
     public void onButtonClickListner(String position, Cita value, String boton) {
         //int Position=position;
-//        if (boton.equals("CONTINUAR")){
-            String Position=position;
-//        }
+        if (boton == "CONTINUAR") {
+            Intent informacionCli = new Intent(Bienvenido.this, InformacionCliente.class);
+            informacionCli.putExtra("diavisita", value.diavisita);
+            informacionCli.putExtra("observacion", value.observacion);
+            informacionCli.putExtra("vndr_codigo", value.vndr_codigo);
+            informacionCli.putExtra("clte_id", value.clte_id);
+            informacionCli.putExtra("longitud", value.longitud);
+            informacionCli.putExtra("latitud", value.latitud);
+            informacionCli.putExtra("cedulaVen", value.cedulaVen);
+            informacionCli.putExtra("nombreCliente", value.nombreCliente);
+            informacionCli.putExtra("direccion", value.direccion);
+            informacionCli.putExtra("telefono1", value.telefono1);
+            informacionCli.putExtra("telefono2", value.telefono2);
+            startActivity(informacionCli);
+        }
 
     }
 
@@ -435,8 +445,6 @@ public class Bienvenido extends AppCompatActivity implements CitaAdapter.customB
             }
         }
     }
-
-
     //LLAMA A DATOS DE CLIENTE
     public Boolean llamarCliente() {
         //
@@ -614,6 +622,8 @@ public class Bienvenido extends AppCompatActivity implements CitaAdapter.customB
                 cita.cedulaVen = ic.getProperty("cedulaVen").toString();
                 cita.nombreCliente = ic.getProperty("nombreCliente").toString();
                 cita.direccion = ic.getProperty("direccion").toString();
+                cita.telefono1= ic.getProperty("telefono1").toString();
+                cita.telefono2= ic.getProperty("telefono2").toString();
                 listaCitas[i] = cita;
             }
         } catch (Exception e) {

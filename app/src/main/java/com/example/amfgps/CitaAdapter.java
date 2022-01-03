@@ -48,6 +48,8 @@ public class CitaAdapter extends ArrayAdapter<Cita> {
         String cedulaVen = getItem(position).cedulaVen;
         String nombreCliente = getItem(position).nombreCliente;
         String direccion = getItem(position).direccion;
+        String telefono1 = getItem(position).telefono1;
+        String telefono2 = getItem(position).telefono2;
 
         //ArticuloPedidos lp = new ArticuloPedidos(idPedido, nombreart, cantidad, punitario, total, cantpro, arti);
         LayoutInflater inlfater = LayoutInflater.from(mcontext);
