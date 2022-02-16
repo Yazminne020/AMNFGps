@@ -423,8 +423,6 @@ public class Bienvenido extends AppCompatActivity implements CitaAdapter.customB
                     new asynCliente().execute();
                 else
                     Toast.makeText(getApplicationContext(), "Sin acceso a Internet", Toast.LENGTH_LONG).show();
-                //tvB.setText("Bienvenido: "+Usuarioc+" / "+Empresa);
-                //Toast.makeText(Bienvenido.this, " Empresa: " + Empresa, Toast.LENGTH_SHORT).show();
             } else {
                 //new Bienvenido();
                 Toast.makeText(Bienvenido.this, "Tiempo de inactividad superado.\nReconectando ...", Toast.LENGTH_SHORT).show();
