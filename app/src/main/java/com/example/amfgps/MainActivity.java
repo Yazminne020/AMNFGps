@@ -1,7 +1,5 @@
 package com.example.amfgps;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -16,6 +14,8 @@ import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.amfgps.tmpdb.DBManager;
 import com.example.amfgps.utilities.Network;
@@ -85,6 +85,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
+
     // En el caso de que el usuario registre sus datos se guarda en sqlite para la recuperacion
     private void autoLogin() {
         try {
@@ -107,6 +108,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
     }
+
     //conectar a la base de datos
     @SuppressLint("SetTextI18n")
     public Boolean f_conectarBD() {
@@ -153,12 +155,14 @@ public class MainActivity extends AppCompatActivity {
         }
         return Bandera;
     }
+
     private void deleteUser() {
         dbManager = new DBManager(context);
         dbManager.open();
         dbManager.deleteAll();
         dbManager.close();
     }
+
     @SuppressLint("StaticFieldLeak")
     private class asynConectarBD extends AsyncTask<String, String, String> {
         @Override
@@ -205,9 +209,9 @@ public class MainActivity extends AppCompatActivity {
                     Toast.makeText(MainActivity.this, "NO SE CONECTO: " + mensaje, Toast.LENGTH_SHORT).show();
                     tv.setText("NO SE CONECTO. " + mensaje);
                 }
-           } else {
+            } else {
                 numeroIntentos++;
-                Log.i(TAG_ACTIVITY,"--- ERR  "+ numeroIntentos);
+                Log.i(TAG_ACTIVITY, "--- ERR  " + numeroIntentos);
                 if (numeroIntentos <= 1) {
                     try {
                         new AsyncSilverApp(getBaseContext()).execute();

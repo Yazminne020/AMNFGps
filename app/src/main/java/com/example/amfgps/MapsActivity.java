@@ -6,6 +6,7 @@ import androidx.fragment.app.FragmentActivity;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Location;
@@ -44,7 +45,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private static final int LOCATION_REQUEST = 500;
     ArrayList<LatLng> listPuntos;
     String respuesta = "";
-    String val = "";
+    String val = "",longLat="",longitud="",latitud="";
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,6 +58,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mapFragment.getMapAsync(this);
         listPuntos = new ArrayList<>();
 
+        Intent intent = getIntent();
+        Bundle extras = intent.getExtras();
+        if (extras != null) {
+            longLat = extras.getString("longLat");
+            longitud = extras.getString("longitud");
+            latitud = extras.getString("latitud");
+        }
     }
 
     /**
@@ -76,13 +85,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap.getUiSettings().setZoomControlsEnabled(true);
         mMap.getUiSettings().setMapToolbarEnabled(true);
 
-        LatLng Quito = new LatLng(-0.180653, -78.467834);
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(Quito, 27));
-        mMap.addMarker(new MarkerOptions().position(Quito).title("Marker in Quito"));
-
-        LatLng l1 = new LatLng(-0.18064748368580735, -78.46789833158255);
+        LatLng l1 = new LatLng(-1.1952468,-78.5933021);
 //        LatLng l2 = new LatLng(  -0.1806582124685286,  -78.46776723861694);
-        LatLng l2 = new LatLng(-0.1806582124685286, -78.46789933741093);
+        LatLng l2 = new LatLng(Double.valueOf(latitud), Double.valueOf(longitud));
+
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(l1, 27));
+        mMap.addMarker(new MarkerOptions().position(l1).title("Marker in Actual"));
 
         double dist=distancia(l1, l2);
 

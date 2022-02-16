@@ -12,7 +12,7 @@ import lombok.Data;
 @Data
 public class Cita implements KvmSerializable {
 
-    public String diavisita, observacion, vndr_codigo, clte_id, longitud, latitud, cedulaVen, nombreCliente, direccion, telefono1, telefono2;
+    public String diavisita, observacion, vndr_codigo, clte_id, longitud, latitud, cedulaVen, nombreCliente, direccion, telefono1, telefono2,longLat;
 
     public Cita() {
 
@@ -28,7 +28,7 @@ public class Cita implements KvmSerializable {
 //        return "-";
 //    }
     public Cita(String Diavisita, String Observacion, String Vndr_codigo, String Clte_id, String Longitud,
-                String Latitud, String CedulaVen, String NombreCliente, String Direccion, String Telefono1, String Telefono2) {
+                String Latitud, String CedulaVen, String NombreCliente, String Direccion, String Telefono1, String Telefono2,String LongLat) {
         this.diavisita = Diavisita;
         this.observacion = Observacion;
         this.vndr_codigo = Vndr_codigo;
@@ -40,6 +40,7 @@ public class Cita implements KvmSerializable {
         this.direccion = Direccion;
         this.telefono1 = Telefono1;
         this.telefono2 = Telefono2;
+        this.longLat=LongLat;
     }
 
     @Override
@@ -67,13 +68,15 @@ public class Cita implements KvmSerializable {
                 return telefono1;
             case 10:
                 return telefono2;
+            case 11:
+                return longLat;
         }
         return null;
     }
 
     @Override
     public int getPropertyCount() {
-        return 11;
+        return 12;
     }
 
     @Override
@@ -111,6 +114,9 @@ public class Cita implements KvmSerializable {
                 break;
             case 10:
                 telefono2 = val.toString();
+                break;
+            case 11:
+                longLat = val.toString();
                 break;
             default:
                 break;
@@ -161,6 +167,9 @@ public class Cita implements KvmSerializable {
             case 10:
                 info.type = PropertyInfo.STRING_CLASS;
                 info.name = "telefono2";
+            case 11:
+                info.type = PropertyInfo.STRING_CLASS;
+                info.name = "longLat";
                 break;
             default:
                 break;

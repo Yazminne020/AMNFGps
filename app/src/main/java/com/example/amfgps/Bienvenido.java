@@ -322,11 +322,13 @@ public class Bienvenido extends AppCompatActivity implements CitaAdapter.customB
             informacionCli.putExtra("clte_id", value.clte_id);
             informacionCli.putExtra("longitud", value.longitud);
             informacionCli.putExtra("latitud", value.latitud);
+            informacionCli.putExtra("longLat", value.longLat);
             informacionCli.putExtra("cedulaVen", value.cedulaVen);
             informacionCli.putExtra("nombreCliente", value.nombreCliente);
             informacionCli.putExtra("direccion", value.direccion);
             informacionCli.putExtra("telefono1", value.telefono1);
             informacionCli.putExtra("telefono2", value.telefono2);
+
             startActivity(informacionCli);
         }
 
@@ -622,6 +624,7 @@ public class Bienvenido extends AppCompatActivity implements CitaAdapter.customB
                 cita.direccion = ic.getProperty("direccion").toString();
                 cita.telefono1= ic.getProperty("telefono1").toString();
                 cita.telefono2= ic.getProperty("telefono2").toString();
+                cita.longLat= tvlocalizacion.getText().toString();
                 listaCitas[i] = cita;
             }
         } catch (Exception e) {
