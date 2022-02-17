@@ -89,7 +89,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 //        LatLng l2 = new LatLng(  -0.1806582124685286,  -78.46776723861694);
         LatLng l2 = new LatLng(Double.valueOf(latitud), Double.valueOf(longitud));
 
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(l1, 27));
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(l1, 8));
         mMap.addMarker(new MarkerOptions().position(l1).title("Marker in Actual"));
 
         double dist=distancia(l1, l2);
