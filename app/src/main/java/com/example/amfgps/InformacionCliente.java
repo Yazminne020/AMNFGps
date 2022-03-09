@@ -12,8 +12,8 @@ import java.util.Calendar;
 
 public class InformacionCliente extends AppCompatActivity {
 
-    TextView tvCliente, tvPhone, tvDireccion, tvMotivo, tvFechHora;
-    Button btnMapa, btnInicio;
+    TextView tvCliente, tvPhone, tvDireccion, tvMotivo, tvFechHora,tvInicio,tvFin;
+    Button btnMapa, btnInicio,btnFin;
     int hora = 0, minuto = 0, segundo = 0;
     Thread iniReloj = null;
     Runnable r;
@@ -32,7 +32,9 @@ public class InformacionCliente extends AppCompatActivity {
         btnMapa = findViewById(R.id.btnMapa);
         btnInicio = findViewById(R.id.btnInicio);
         tvFechHora=findViewById(R.id.tvFechHora);
-
+        tvInicio=findViewById(R.id.tvInicio);
+        tvFin =findViewById(R.id.tvFin);
+        btnFin=findViewById(R.id.btnFin);
         r = new RefreshClock();
         iniReloj = new Thread(r);
         iniReloj.start();
@@ -40,7 +42,7 @@ public class InformacionCliente extends AppCompatActivity {
         Cita cita = new Cita();
         Intent intent = getIntent();
         Bundle extras = intent.getExtras();
-
+        btnFin.setEnabled(false);
         if (extras != null) {
             cita.diavisita = extras.getString("diavisita");
             cita.observacion = extras.getString("observacion");
@@ -73,10 +75,20 @@ public class InformacionCliente extends AppCompatActivity {
         btnInicio.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                iniReloj.interrupt();
+                //iniReloj.interrupt();
+                tvInicio.setText(tvFechHora.getText());
+                btnFin.setEnabled(true);
+                btnInicio.setEnabled(false);
             }
         });
-
+        btnFin.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                //iniReloj.interrupt();
+                tvFin.setText(tvFechHora.getText());
+                btnFin.setEnabled(false);
+            }
+        });
 
     }
 
