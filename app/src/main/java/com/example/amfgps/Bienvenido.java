@@ -1,44 +1,24 @@
 package com.example.amfgps;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-import androidx.core.content.PackageManagerCompat;
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
-
 import android.Manifest;
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.app.ProgressDialog;
 import android.app.TimePickerDialog;
-import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
-import android.location.Address;
-import android.location.Geocoder;
 import android.location.Location;
-import android.location.LocationListener;
-import android.location.LocationManager;
-import android.location.LocationProvider;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Looper;
 import android.os.StrictMode;
-import android.provider.Settings;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
@@ -47,6 +27,12 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.example.amfgps.utilities.Network;
 import com.google.android.gms.location.LocationCallback;
@@ -61,20 +47,16 @@ import org.ksoap2.serialization.SoapPrimitive;
 import org.ksoap2.serialization.SoapSerializationEnvelope;
 import org.ksoap2.transport.HttpTransportSE;
 
-import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
-import java.util.List;
-import java.util.Locale;
 
 public class Bienvenido extends AppCompatActivity implements CitaAdapter.customButtonListener {
 
-    TextView tvFecha, tvB, tvHora, tvlocalizacion;
+    TextView  tvB, tvHora, tvlocalizacion;
+    EditText tvFecha;
     Button btnUbicacion;
     private String _usuario, Usuarioc, empresac, Clave;
     private ProgressDialog dialogo;
@@ -121,7 +103,7 @@ public class Bienvenido extends AppCompatActivity implements CitaAdapter.customB
 
         tomarFecha(year, month, day);
         //tomarUbicacion();
-//Permiso GPS
+        //Permiso GPS
         int permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION);
         if (permissionCheck == PackageManager.PERMISSION_DENIED) {
             if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_FINE_LOCATION)) {
@@ -151,7 +133,6 @@ public class Bienvenido extends AppCompatActivity implements CitaAdapter.customB
             g.setEmpresa(d2);
             if (Network.compruebaConexion(getApplicationContext())) {
                 new asyntodos().execute();
-                //new asyncitaClientes().execute();
             } else
                 Toast.makeText(getApplicationContext(), "Sin acceso a Internet", Toast.LENGTH_LONG).show();
         }
@@ -160,8 +141,24 @@ public class Bienvenido extends AppCompatActivity implements CitaAdapter.customB
         ImageButton button = (ImageButton) findViewById(R.id.btnFechaDesdeDialog);
         button.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                Intent irbienvenido = new Intent(Bienvenido.this, MapsActivity.class);
-                startActivity(irbienvenido);
+//                Intent irbienvenido = new Intent(Bienvenido.this, MapsActivity.class);
+//                startActivity(irbienvenido);
+             //   try {
+                    citas = listaCitaClientes();
+                    val = tvlocalizacion.getText().toString();
+                    auxiliar = controlDistancia(val, citas);
+                    if (auxiliar != null) {
+                        for (int i = 0; i < auxiliar.length; i++) {
+
+                            names.add(auxiliar[i]);
+                        }
+                        adapterp1 = new CitaAdapter(Bienvenido.this, R.layout.lista_cita_cliente, names);
+                        listViewPedido.setAdapter(adapterp1);
+                        adapterp1.setCustomButtonListner(Bienvenido.this);
+                   }
+                //} catch (Exception e) {
+                //}
+
             }
         });
 
@@ -185,7 +182,7 @@ public class Bienvenido extends AppCompatActivity implements CitaAdapter.customB
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 // System.out.println(s.toString() + " " + start + " " + count);
-                if (tvlocalizacion.getText().toString().isEmpty()) {
+                if (tvlocalizacion.getText().toString().isEmpty() || tvFecha.getText().toString().isEmpty()) {
 
                 } else {
                     citas = listaCitaClientes();
@@ -277,8 +274,8 @@ public class Bienvenido extends AppCompatActivity implements CitaAdapter.customB
                 DatePickerDialog datePickerDialog = new DatePickerDialog(Bienvenido.this,
                         android.R.style.Theme_Holo_Light_Dialog_MinWidth, setListener, year, month, day);
                 datePickerDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-                datePickerDialog.getDatePicker().setMinDate(System.currentTimeMillis() - 1000); //Bloquear tiempo pasado
-                datePickerDialog.getDatePicker().setMaxDate(new Date().getTime() + (1000L * 60 * 60 * 24 * 31)); //Bloquear tiempo futuro
+//                datePickerDialog.getDatePicker().setMinDate(System.currentTimeMillis() - 1000); //Bloquear tiempo pasado
+//                datePickerDialog.getDatePicker().setMaxDate(new Date().getTime() + (1000L * 60 * 60 * 24 * 31)); //Bloquear tiempo futuro
                 datePickerDialog.show();
             }
         });
@@ -445,6 +442,7 @@ public class Bienvenido extends AppCompatActivity implements CitaAdapter.customB
             }
         }
     }
+
     //LLAMA A DATOS DE CLIENTE
     public Boolean llamarCliente() {
         //
@@ -622,9 +620,9 @@ public class Bienvenido extends AppCompatActivity implements CitaAdapter.customB
                 cita.cedulaVen = ic.getProperty("cedulaVen").toString();
                 cita.nombreCliente = ic.getProperty("nombreCliente").toString();
                 cita.direccion = ic.getProperty("direccion").toString();
-                cita.telefono1= ic.getProperty("telefono1").toString();
-                cita.telefono2= ic.getProperty("telefono2").toString();
-                cita.longLat= tvlocalizacion.getText().toString();
+                cita.telefono1 = ic.getProperty("telefono1").toString();
+                cita.telefono2 = ic.getProperty("telefono2").toString();
+                cita.longLat = tvlocalizacion.getText().toString();
                 listaCitas[i] = cita;
             }
         } catch (Exception e) {
