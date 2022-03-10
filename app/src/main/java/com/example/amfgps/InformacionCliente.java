@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.RadioButton;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -14,6 +15,7 @@ public class InformacionCliente extends AppCompatActivity {
 
     TextView tvCliente, tvPhone, tvDireccion, tvMotivo, tvFechHora,tvInicio,tvFin;
     Button btnMapa, btnInicio,btnFin;
+    RadioButton rbVisita;
     int hora = 0, minuto = 0, segundo = 0;
     Thread iniReloj = null;
     Runnable r;
@@ -35,6 +37,9 @@ public class InformacionCliente extends AppCompatActivity {
         tvInicio=findViewById(R.id.tvInicio);
         tvFin =findViewById(R.id.tvFin);
         btnFin=findViewById(R.id.btnFin);
+        rbVisita=findViewById(R.id.rbVisita);
+
+        rbVisita.setChecked(true);
         r = new RefreshClock();
         iniReloj = new Thread(r);
         iniReloj.start();
