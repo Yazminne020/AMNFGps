@@ -1,5 +1,6 @@
 package com.example.amfgps;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.StrictMode;
@@ -10,6 +11,7 @@ import android.widget.RadioButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import org.ksoap2.SoapEnvelope;
@@ -123,13 +125,13 @@ public class InformacionCliente extends AppCompatActivity {
                         }
                     }else {
                         if (rbReagendar.isChecked()){
-                            
-                            boolean resp= guardarClientes("20/12/2021", "20/12/2021", "21/12/2021", "ob12", "EC", "9697", "MGK","RG");
-                            if (resp){
-                                Toast.makeText(InformacionCliente.this, "Guardado con Éxito", Toast.LENGTH_SHORT).show();
-                            }else{
-                                Toast.makeText(InformacionCliente.this, "Ha ocurrido un error", Toast.LENGTH_SHORT).show();
-                            }
+                            mostrarDialogoBasico();
+                           // boolean resp= guardarClientes("20/12/2021", "20/12/2021", "21/12/2021", "ob12", "EC", "9697", "MGK","RG");
+                            // if (resp){
+                            //    Toast.makeText(InformacionCliente.this, "Guardado con Éxito", Toast.LENGTH_SHORT).show();
+                            //}else{
+                            //    Toast.makeText(InformacionCliente.this, "Ha ocurrido un error", Toast.LENGTH_SHORT).show();
+                            //}
                         }
                     }
                 }catch (Exception e){
@@ -138,7 +140,28 @@ public class InformacionCliente extends AppCompatActivity {
             }
         });
     }
+    private void mostrarDialogoBasico(){
+        AlertDialog.Builder builder = new AlertDialog.Builder(InformacionCliente.this);
+        builder.setTitle("Reagendar");
+        builder.setMessage("¿Desea reagendar una cita para este cliente?")
+                .setPositiveButton("Sí", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        //Toast.makeText(getApplicationContext(),"Si",Toast.LENGTH_SHORT).show();
 
+                    }
+                })
+                .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        //Toast.makeText(getApplicationContext(),"No",Toast.LENGTH_SHORT).show();
+
+                        dialog.dismiss();
+                    }
+                })
+                .setCancelable(false)
+                .show();
+    }
     private void initClock() {
         runOnUiThread(new Runnable() {
             @Override

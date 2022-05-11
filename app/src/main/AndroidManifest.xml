@@ -21,7 +21,8 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.AMFGps"
         android:usesCleartextTraffic="true">
-        <activity android:name=".InformacionCliente"></activity>
+        <activity android:name=".Reagenda"></activity>
+        <activity android:name=".InformacionCliente" />
         <activity android:name=".DatosCliente" />
         <!--
              The API key for Google Maps-based APIs is defined as a string resource.
