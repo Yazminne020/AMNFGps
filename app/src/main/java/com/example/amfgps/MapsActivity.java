@@ -84,13 +84,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap.setMyLocationEnabled(true);
         mMap.getUiSettings().setZoomControlsEnabled(true);
         mMap.getUiSettings().setMapToolbarEnabled(true);
+        String lon=longLat.split(" ")[0];
+        String lat=longLat.split(" ")[1];
 
-        LatLng l1 = new LatLng(-1.1952468,-78.5933021);
-//        LatLng l2 = new LatLng(  -0.1806582124685286,  -78.46776723861694);
+        LatLng l1 = new LatLng(Double.valueOf(lat),Double.valueOf(lon));
+//        LatLng l2 = new LatLng(  -1.2124967,  -78.5975868);
         LatLng l2 = new LatLng(Double.valueOf(latitud), Double.valueOf(longitud));
 
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(l1, 8));
-        mMap.addMarker(new MarkerOptions().position(l1).title("Marker in Actual"));
+        mMap.addMarker(new MarkerOptions().position(l1).title("Marker Actual"));
 
         double dist=distancia(l1, l2);
 

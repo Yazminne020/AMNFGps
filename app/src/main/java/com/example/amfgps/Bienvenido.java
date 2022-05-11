@@ -143,7 +143,7 @@ public class Bienvenido extends AppCompatActivity implements CitaAdapter.customB
             public void onClick(View v) {
 //                Intent irbienvenido = new Intent(Bienvenido.this, MapsActivity.class);
 //                startActivity(irbienvenido);
-             //   try {
+                try {
                     citas = listaCitaClientes();
                     val = tvlocalizacion.getText().toString();
                     auxiliar = controlDistancia(val, citas);
@@ -156,8 +156,8 @@ public class Bienvenido extends AppCompatActivity implements CitaAdapter.customB
                         listViewPedido.setAdapter(adapterp1);
                         adapterp1.setCustomButtonListner(Bienvenido.this);
                    }
-                //} catch (Exception e) {
-                //}
+                } catch (Exception e) {
+                }
 
             }
         });
@@ -313,6 +313,7 @@ public class Bienvenido extends AppCompatActivity implements CitaAdapter.customB
         //int Position=position;
         if (boton == "CONTINUAR") {
             Intent informacionCli = new Intent(Bienvenido.this, InformacionCliente.class);
+            informacionCli.putExtra("rtvi", value.rtvi);
             informacionCli.putExtra("diavisita", value.diavisita);
             informacionCli.putExtra("observacion", value.observacion);
             informacionCli.putExtra("vndr_codigo", value.vndr_codigo);
@@ -325,6 +326,8 @@ public class Bienvenido extends AppCompatActivity implements CitaAdapter.customB
             informacionCli.putExtra("direccion", value.direccion);
             informacionCli.putExtra("telefono1", value.telefono1);
             informacionCli.putExtra("telefono2", value.telefono2);
+            informacionCli.putExtra("estado", value.estado);
+
 
             startActivity(informacionCli);
         }
@@ -611,6 +614,7 @@ public class Bienvenido extends AppCompatActivity implements CitaAdapter.customB
                 SoapObject ic = (SoapObject) resSoap.getProperty(i);
 
                 Cita cita = new Cita();
+                cita.rtvi=ic.getProperty("rtvi").toString();
                 cita.diavisita = ic.getProperty("diavisita").toString();
                 cita.observacion = ic.getProperty("observacion").toString();
                 cita.vndr_codigo = ic.getProperty("vndr_codigo").toString();
@@ -623,6 +627,7 @@ public class Bienvenido extends AppCompatActivity implements CitaAdapter.customB
                 cita.telefono1 = ic.getProperty("telefono1").toString();
                 cita.telefono2 = ic.getProperty("telefono2").toString();
                 cita.longLat = tvlocalizacion.getText().toString();
+                cita.estado = ic.getProperty("estado").toString();
                 listaCitas[i] = cita;
             }
         } catch (Exception e) {

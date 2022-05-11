@@ -5,8 +5,10 @@ import android.os.Bundle;
 import android.os.StrictMode;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -20,14 +22,15 @@ import java.util.Calendar;
 
 public class InformacionCliente extends AppCompatActivity {
 
-    TextView tvCliente, tvPhone, tvDireccion, tvMotivo, tvFechHora,tvInicio,tvFin;
+    TextView tvCliente, tvPhone, tvDireccion, tvFechHora,tvInicio,tvFin;
+    EditText txtObservacion;
     Button btnMapa, btnInicio,btnFin,btnGuardar;
     RadioButton rbVisita,rbReagendar;
     int hora = 0, minuto = 0, segundo = 0;
     Thread iniReloj = null;
     Runnable r;
     boolean isUpdate = false;
-    String sec, min, hor, curTime;
+    String sec, min, hor, curTime,rtviG="";
     private Resultado[] listaResultado;
 
 
@@ -38,7 +41,6 @@ public class InformacionCliente extends AppCompatActivity {
         tvCliente = findViewById(R.id.tvCliente);
         tvPhone = findViewById(R.id.tvPhone);
         tvDireccion = findViewById(R.id.tvDireccion);
-        tvMotivo = findViewById(R.id.tvMotivo);
         btnMapa = findViewById(R.id.btnMapa);
         btnInicio = findViewById(R.id.btnInicio);
         tvFechHora=findViewById(R.id.tvFechHora);
@@ -48,6 +50,7 @@ public class InformacionCliente extends AppCompatActivity {
         rbVisita=findViewById(R.id.rbVisita);
         btnGuardar=findViewById(R.id.btnGuardar);
         rbReagendar=findViewById(R.id.rbReagendar);
+        txtObservacion=findViewById(R.id.txtObservacion);
 
         rbVisita.setChecked(true);
         r = new RefreshClock();
@@ -59,6 +62,7 @@ public class InformacionCliente extends AppCompatActivity {
         Bundle extras = intent.getExtras();
         btnFin.setEnabled(false);
         if (extras != null) {
+            cita.rtvi= extras.getString("rtvi");
             cita.diavisita = extras.getString("diavisita");
             cita.observacion = extras.getString("observacion");
             cita.vndr_codigo = extras.getString("vndr_codigo");
@@ -71,10 +75,12 @@ public class InformacionCliente extends AppCompatActivity {
             cita.direccion = extras.getString("direccion");
             cita.telefono1 = extras.getString("telefono1");
             cita.telefono2 = extras.getString("telefono2");
+            cita.estado = extras.getString("estado");
+
+            rtviG=cita.rtvi;
             tvCliente.setText(cita.nombreCliente);
             tvPhone.setText(cita.telefono1 + " " + cita.telefono2);
             tvDireccion.setText(cita.direccion);
-            tvMotivo.setText(cita.observacion);
         }
         btnMapa.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -109,11 +115,21 @@ public class InformacionCliente extends AppCompatActivity {
             public void onClick(View view) {
                 try {
                     if (rbVisita.isChecked()){
-                        boolean resp= guardarClientes("20/12/2021", "20/12/2021", "21/12/2021", "ob9", "EC", "9697", "mgk");
-
+                        boolean resp= actualizarClientes(txtObservacion.getText().toString(),tvInicio.getText().toString(),tvFin.getText().toString(),"SI",rtviG);
+                        if (resp){
+                            Toast.makeText(InformacionCliente.this, "Actualizado con Éxito", Toast.LENGTH_SHORT).show();
+                        }else{
+                            Toast.makeText(InformacionCliente.this, "Ha ocurrido un error", Toast.LENGTH_SHORT).show();
+                        }
                     }else {
                         if (rbReagendar.isChecked()){
-
+                            
+                            boolean resp= guardarClientes("20/12/2021", "20/12/2021", "21/12/2021", "ob12", "EC", "9697", "MGK","RG");
+                            if (resp){
+                                Toast.makeText(InformacionCliente.this, "Guardado con Éxito", Toast.LENGTH_SHORT).show();
+                            }else{
+                                Toast.makeText(InformacionCliente.this, "Ha ocurrido un error", Toast.LENGTH_SHORT).show();
+                            }
                         }
                     }
                 }catch (Exception e){
@@ -139,7 +155,7 @@ public class InformacionCliente extends AppCompatActivity {
                     String month = String.valueOf(c.get(Calendar.MONTH));
                     String day = String.valueOf(c.get(Calendar.DAY_OF_MONTH));
 
-                    curTime =day+"/"+month+"/"+ year+"  "+hor + hora + min + minuto + sec + segundo;
+                    curTime =day+"/"+month+"/"+ year+" "+hor + hora + min + minuto + sec + segundo;
                     tvFechHora.setText(curTime);
                 } catch (Exception e) {
                 }
@@ -210,7 +226,7 @@ public class InformacionCliente extends AppCompatActivity {
         }
     }
 
-    public Boolean guardarClientes(String fecha, String fechainicio,String fechafin, String observacion, String codVendedor, String idCliente,String empresa) {
+    public Boolean guardarClientes(String fecha, String fechainicio,String fechafin, String observacion, String codVendedor, String idCliente,String empresa, String estado) {
         //
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
@@ -226,6 +242,7 @@ public class InformacionCliente extends AppCompatActivity {
         request.addProperty("codVendedor", codVendedor);
         request.addProperty("idCliente", idCliente);
         request.addProperty("empresa", empresa);
+        request.addProperty("estado", estado);
         SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(SoapEnvelope.VER11);
         envelope.dotNet = true;
         envelope.setOutputSoapObject(request);
@@ -236,6 +253,34 @@ public class InformacionCliente extends AppCompatActivity {
         //transporte.debug = true;
         try {
             transporte.call(configuracion.NAMESPACE + "GuardarClientesGPS", envelope);
+            Bandera =true;
+        } catch (Exception e) {
+            //Print error
+            e.printStackTrace();
+            Bandera = false;
+        }
+        return Bandera;
+    }
+    public Boolean actualizarClientes(String observacion, String fechainicio,String fechafin,String estado, String rtvi) {
+        //
+        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+        StrictMode.setThreadPolicy(policy);
+
+        boolean Bandera = false;
+
+        SoapObject request = new SoapObject(configuracion.NAMESPACE, "ActualizarClientesGPS");
+        request.addProperty("observacion", observacion);
+        request.addProperty("fechainicio", fechainicio);
+        request.addProperty("fechafin", fechafin);
+        request.addProperty("estado", estado);
+        request.addProperty("rtvi", rtvi);
+        SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(SoapEnvelope.VER11);
+        envelope.dotNet = true;
+        envelope.setOutputSoapObject(request);
+
+        HttpTransportSE transporte = new HttpTransportSE(configuracion.URL);
+        try {
+            transporte.call(configuracion.NAMESPACE + "ActualizarClientesGPS", envelope);
             Bandera =true;
         } catch (Exception e) {
             //Print error

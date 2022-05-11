@@ -12,7 +12,7 @@ import lombok.Data;
 @Data
 public class Cita implements KvmSerializable {
 
-    public String diavisita, observacion, vndr_codigo, clte_id, longitud, latitud, cedulaVen, nombreCliente, direccion, telefono1, telefono2,longLat;
+    public String rtvi,diavisita, observacion, vndr_codigo, clte_id, longitud, latitud, cedulaVen, nombreCliente, direccion, telefono1, telefono2,longLat,estado;
 
     public Cita() {
 
@@ -27,8 +27,9 @@ public class Cita implements KvmSerializable {
 //        }
 //        return "-";
 //    }
-    public Cita(String Diavisita, String Observacion, String Vndr_codigo, String Clte_id, String Longitud,
-                String Latitud, String CedulaVen, String NombreCliente, String Direccion, String Telefono1, String Telefono2,String LongLat) {
+    public Cita(String Rtvi, String Diavisita, String Observacion, String Vndr_codigo, String Clte_id, String Longitud,
+                String Latitud, String CedulaVen, String NombreCliente, String Direccion, String Telefono1, String Telefono2,String LongLat,String Estado) {
+        this.rtvi = Rtvi;
         this.diavisita = Diavisita;
         this.observacion = Observacion;
         this.vndr_codigo = Vndr_codigo;
@@ -41,82 +42,94 @@ public class Cita implements KvmSerializable {
         this.telefono1 = Telefono1;
         this.telefono2 = Telefono2;
         this.longLat=LongLat;
+        this.estado=Estado;
+
     }
 
     @Override
     public Object getProperty(int i) {
         switch (i) {
-            case 0:
-                return diavisita;
             case 1:
-                return observacion;
+                return rtvi;
             case 2:
-                return vndr_codigo;
+                return diavisita;
             case 3:
-                return clte_id;
+                return observacion;
             case 4:
-                return longitud;
+                return vndr_codigo;
             case 5:
-                return latitud;
+                return clte_id;
             case 6:
-                return cedulaVen;
+                return longitud;
             case 7:
-                return nombreCliente;
+                return latitud;
             case 8:
-                return direccion;
+                return cedulaVen;
             case 9:
-                return telefono1;
+                return nombreCliente;
             case 10:
-                return telefono2;
+                return direccion;
             case 11:
+                return telefono1;
+            case 12:
+                return telefono2;
+            case 13:
                 return longLat;
+            case 14:
+                return estado;
         }
         return null;
     }
 
     @Override
     public int getPropertyCount() {
-        return 12;
+        return 14;
     }
 
     @Override
     public void setProperty(int i, Object val) {
         switch (i) {
             case 0:
-                diavisita = val.toString();
+                rtvi = val.toString();
                 break;
             case 1:
-                observacion = val.toString();
+                diavisita = val.toString();
                 break;
             case 2:
-                vndr_codigo = val.toString();
+                observacion = val.toString();
                 break;
             case 3:
-                clte_id = val.toString();
+                vndr_codigo = val.toString();
                 break;
             case 4:
-                longitud = val.toString();
+                clte_id = val.toString();
                 break;
             case 5:
-                latitud = val.toString();
+                longitud = val.toString();
                 break;
             case 6:
-                cedulaVen = val.toString();
+                latitud = val.toString();
                 break;
             case 7:
-                nombreCliente = val.toString();
+                cedulaVen = val.toString();
                 break;
             case 8:
-                direccion = val.toString();
+                nombreCliente = val.toString();
                 break;
             case 9:
-                telefono1 = val.toString();
+                direccion = val.toString();
                 break;
             case 10:
-                telefono2 = val.toString();
+                telefono1 = val.toString();
                 break;
             case 11:
+                telefono2 = val.toString();
+                break;
+            case 12:
                 longLat = val.toString();
+                break;
+            case 13:
+                estado = val.toString();
                 break;
             default:
                 break;
@@ -128,48 +141,56 @@ public class Cita implements KvmSerializable {
         switch (i) {
             case 0:
                 info.type = PropertyInfo.STRING_CLASS;
-                info.name = "diavisita";
+                info.name = "rtvi";
                 break;
             case 1:
                 info.type = PropertyInfo.STRING_CLASS;
-                info.name = "observacion";
+                info.name = "diavisita";
                 break;
             case 2:
                 info.type = PropertyInfo.STRING_CLASS;
-                info.name = "vndr_codigo";
+                info.name = "observacion";
                 break;
             case 3:
                 info.type = PropertyInfo.STRING_CLASS;
-                info.name = "clte_id";
+                info.name = "vndr_codigo";
                 break;
             case 4:
                 info.type = PropertyInfo.STRING_CLASS;
-                info.name = "longitud";
+                info.name = "clte_id";
                 break;
             case 5:
                 info.type = PropertyInfo.STRING_CLASS;
-                info.name = "latitud";
+                info.name = "longitud";
                 break;
             case 6:
                 info.type = PropertyInfo.STRING_CLASS;
-                info.name = "cedulaVen";
+                info.name = "latitud";
                 break;
             case 7:
                 info.type = PropertyInfo.STRING_CLASS;
-                info.name = "nombreCliente";
+                info.name = "cedulaVen";
                 break;
             case 8:
                 info.type = PropertyInfo.STRING_CLASS;
-                info.name = "direccion";
+                info.name = "nombreCliente";
+                break;
             case 9:
                 info.type = PropertyInfo.STRING_CLASS;
-                info.name = "telefono1";
+                info.name = "direccion";
             case 10:
                 info.type = PropertyInfo.STRING_CLASS;
-                info.name = "telefono2";
+                info.name = "telefono1";
             case 11:
                 info.type = PropertyInfo.STRING_CLASS;
+                info.name = "telefono2";
+            case 12:
+                info.type = PropertyInfo.STRING_CLASS;
                 info.name = "longLat";
+                break;
+            case 13:
+                info.type = PropertyInfo.STRING_CLASS;
+                info.name = "estado";
                 break;
             default:
                 break;

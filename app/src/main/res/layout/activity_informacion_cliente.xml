@@ -40,17 +40,6 @@
         app:layout_constraintTop_toBottomOf="@+id/textView6" />
 
     <TextView
-        android:id="@+id/textView8"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginLeft="16dp"
-        android:layout_marginTop="8dp"
-        android:text="Motivo:"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView7" />
-
-    <TextView
         android:id="@+id/tvCliente"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -87,18 +76,6 @@
         app:layout_constraintStart_toEndOf="@+id/textView7"
         app:layout_constraintTop_toBottomOf="@+id/tvPhone" />
 
-    <TextView
-        android:id="@+id/tvMotivo"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="34dp"
-        android:layout_marginLeft="34dp"
-        android:layout_marginTop="8dp"
-        android:text="TextView"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/textView8"
-        app:layout_constraintTop_toBottomOf="@+id/tvDireccion" />
-
     <Button
         android:id="@+id/btnMapa"
         android:layout_width="410dp"
@@ -114,13 +91,13 @@
         android:id="@+id/btnInicio"
         android:layout_width="175dp"
         android:layout_height="40dp"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="24dp"
         android:text="Iniciar Visita"
         app:backgroundTint="#EB0B8E3B"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.075"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tvMotivo" />
+        app:layout_constraintTop_toBottomOf="@+id/tvDireccion" />
 
     <Button
         android:id="@+id/btnGuardar"
@@ -212,7 +189,7 @@
         android:id="@+id/btnFin"
         android:layout_width="175dp"
         android:layout_height="40dp"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="24dp"
         android:layout_marginEnd="12dp"
         android:layout_marginRight="12dp"
         android:text="Finalizar Visita"
@@ -221,8 +198,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.516"
         app:layout_constraintStart_toEndOf="@+id/btnInicio"
-        app:layout_constraintTop_toBottomOf="@+id/tvMotivo"
-        app:layout_constraintVertical_bias="1.0" />
+        app:layout_constraintTop_toBottomOf="@+id/tvDireccion" />
 
     <LinearLayout
         android:id="@+id/linearLayout2"
@@ -267,7 +243,7 @@
         app:layout_constraintVertical_bias="0.1" />
 
     <EditText
-        android:id="@+id/editTextTextMultiLine"
+        android:id="@+id/txtObservacion"
         android:layout_width="375dp"
         android:layout_height="113dp"
         android:ems="10"

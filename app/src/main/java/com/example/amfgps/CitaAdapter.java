@@ -39,6 +39,8 @@ public class CitaAdapter extends ArrayAdapter<Cita> {
     public View getView(final int position, View convertView, ViewGroup parent) {
 //        return super.getView(position, convertView, parent);
         Cita infoC=getItem(position);
+
+        String rtvi = getItem(position).rtvi;
         String diavisita = getItem(position).diavisita;
         String observacion = getItem(position).observacion;
         String vndr_codigo = getItem(position).vndr_codigo;
