@@ -8,6 +8,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -15,25 +16,29 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import org.ksoap2.SoapEnvelope;
-import org.ksoap2.serialization.MarshalBase64;
 import org.ksoap2.serialization.SoapObject;
 import org.ksoap2.serialization.SoapSerializationEnvelope;
 import org.ksoap2.transport.HttpTransportSE;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 
 public class InformacionCliente extends AppCompatActivity {
 
-    TextView tvCliente, tvPhone, tvDireccion, tvFechHora,tvInicio,tvFin;
+    TextView tvCliente, tvPhone, tvDireccion, tvFechHora, tvInicio, tvFin,tvInformacion,tvCitaid;
     EditText txtObservacion;
-    Button btnMapa, btnInicio,btnFin,btnGuardar;
-    RadioButton rbVisita,rbReagendar;
+    Button btnMapa, btnInicio, btnFin, btnGuardar;
+    RadioButton rbVisita, rbReagendar;
     int hora = 0, minuto = 0, segundo = 0;
     Thread iniReloj = null;
     Runnable r;
     boolean isUpdate = false;
-    String sec, min, hor, curTime,rtviG="";
+    String sec, min, hor, curTime, rtviG = "";
     private Resultado[] listaResultado;
+    Cita cita = new Cita();
 
 
     @Override
@@ -45,26 +50,27 @@ public class InformacionCliente extends AppCompatActivity {
         tvDireccion = findViewById(R.id.tvDireccion);
         btnMapa = findViewById(R.id.btnMapa);
         btnInicio = findViewById(R.id.btnInicio);
-        tvFechHora=findViewById(R.id.tvFechHora);
-        tvInicio=findViewById(R.id.tvInicio);
-        tvFin =findViewById(R.id.tvFin);
-        btnFin=findViewById(R.id.btnFin);
-        rbVisita=findViewById(R.id.rbVisita);
-        btnGuardar=findViewById(R.id.btnGuardar);
-        rbReagendar=findViewById(R.id.rbReagendar);
-        txtObservacion=findViewById(R.id.txtObservacion);
+        tvFechHora = findViewById(R.id.tvFechHora);
+        tvInicio = findViewById(R.id.tvInicio);
+        tvFin = findViewById(R.id.tvFin);
+        btnFin = findViewById(R.id.btnFin);
+        rbVisita = findViewById(R.id.rbVisita);
+        btnGuardar = findViewById(R.id.btnGuardar);
+        rbReagendar = findViewById(R.id.rbReagendar);
+        txtObservacion = findViewById(R.id.txtObservacion);
+        tvInformacion=findViewById(R.id.tvInformacion);
+        tvCitaid=findViewById(R.id.tvCitaid);
 
         rbVisita.setChecked(true);
         r = new RefreshClock();
         iniReloj = new Thread(r);
         iniReloj.start();
 
-        Cita cita = new Cita();
         Intent intent = getIntent();
         Bundle extras = intent.getExtras();
         btnFin.setEnabled(false);
         if (extras != null) {
-            cita.rtvi= extras.getString("rtvi");
+            cita.rtvi = extras.getString("rtvi");
             cita.diavisita = extras.getString("diavisita");
             cita.observacion = extras.getString("observacion");
             cita.vndr_codigo = extras.getString("vndr_codigo");
@@ -79,11 +85,15 @@ public class InformacionCliente extends AppCompatActivity {
             cita.telefono2 = extras.getString("telefono2");
             cita.estado = extras.getString("estado");
 
-            rtviG=cita.rtvi;
+            rtviG = cita.rtvi;
             tvCliente.setText(cita.nombreCliente);
             tvPhone.setText(cita.telefono1 + " " + cita.telefono2);
             tvDireccion.setText(cita.direccion);
+            tvCitaid.setText(cita.rtvi);
         }
+        rbVisita.setEnabled(false);
+        rbReagendar.setEnabled(false);
+        bloquearCampos(true);
         btnMapa.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -110,58 +120,119 @@ public class InformacionCliente extends AppCompatActivity {
                 //iniReloj.interrupt();
                 tvFin.setText(tvFechHora.getText());
                 btnFin.setEnabled(false);
+                rbVisita.setEnabled(true);
+                rbReagendar.setEnabled(true);
             }
         });
         btnGuardar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 try {
-                    if (rbVisita.isChecked()){
-                        boolean resp= actualizarClientes(txtObservacion.getText().toString(),tvInicio.getText().toString(),tvFin.getText().toString(),"SI",rtviG);
-                        if (resp){
-                            Toast.makeText(InformacionCliente.this, "Actualizado con Éxito", Toast.LENGTH_SHORT).show();
-                        }else{
+                    if (rbVisita.isChecked()) {
+                        boolean resp = actualizarClientes(txtObservacion.getText().toString(), tvInicio.getText().toString(), tvFin.getText().toString(), "SI", rtviG);
+                        if (resp) {
+                            Toast.makeText(InformacionCliente.this, "Actualizado con Éxito " + cita.rtvi, Toast.LENGTH_SHORT).show();
+                            bloquearCampos(false);
+
+                        } else {
                             Toast.makeText(InformacionCliente.this, "Ha ocurrido un error", Toast.LENGTH_SHORT).show();
                         }
-                    }else {
-                        if (rbReagendar.isChecked()){
-                            mostrarDialogoBasico();
-                           // boolean resp= guardarClientes("20/12/2021", "20/12/2021", "21/12/2021", "ob12", "EC", "9697", "MGK","RG");
-                            // if (resp){
-                            //    Toast.makeText(InformacionCliente.this, "Guardado con Éxito", Toast.LENGTH_SHORT).show();
-                            //}else{
-                            //    Toast.makeText(InformacionCliente.this, "Ha ocurrido un error", Toast.LENGTH_SHORT).show();
-                            //}
+                    }else{
+                        if(rbReagendar.isChecked()){
+                            txtObservacion.setEnabled(true);
+                            boolean resp = reagendarClientes(cita.rtvi, txtObservacion.getText().toString().split(":")[1].trim(), tvInformacion.getText().toString()+". "+txtObservacion.getText().toString(),cita.vndr_codigo , cita.clte_id);
+                            if (resp) {
+                                Toast.makeText(InformacionCliente.this, "Guardado con Éxito", Toast.LENGTH_SHORT).show();
+                            } else {
+                                Toast.makeText(InformacionCliente.this, "Ha ocurrido un error", Toast.LENGTH_SHORT).show();
+                            }
                         }
                     }
-                }catch (Exception e){
+                } catch (Exception e) {
 
                 }
             }
         });
     }
-    private void mostrarDialogoBasico(){
+
+    private void bloquearCampos(boolean resp) {
+
+        //txtObservacion.setEnabled(!resp);
+        if (resp) {
+            txtObservacion.setText("");
+        }
+        btnGuardar.setEnabled(resp);
+    }
+
+    public void onRadioButtonClicked(View view) {
+        // Is the button now checked?
+        boolean checked = ((RadioButton) view).isChecked();
+
+        // Check which radio button was clicked
+        switch (view.getId()) {
+            case R.id.rbReagendar:
+                if (checked) {
+                    mostrarDialogoBasico();
+                }
+                break;
+            case R.id.rbVisita:
+                if (checked) {
+                    txtObservacion.setText("");
+                    txtObservacion.setEnabled(true);
+                }
+                break;
+        }
+    }
+
+    private void mostrarDialogoBasico() {
         AlertDialog.Builder builder = new AlertDialog.Builder(InformacionCliente.this);
         builder.setTitle("Reagendar");
         builder.setMessage("¿Desea reagendar una cita para este cliente?")
                 .setPositiveButton("Sí", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        //Toast.makeText(getApplicationContext(),"Si",Toast.LENGTH_SHORT).show();
-
+                        Intent informacionCli = new Intent(InformacionCliente.this, Reagenda.class);
+                        //informacionCli.putExtra("longLat", "cita.longLat");
+                        startActivity(informacionCli);
+                        txtObservacion.setText("");
                     }
                 })
-                .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+                .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        //Toast.makeText(getApplicationContext(),"No",Toast.LENGTH_SHORT).show();
-
+                        Date fecha = new Date();
+                        DateFormat formato = new SimpleDateFormat("dd/MM/yyyy");
+                        try {
+                            fecha = formato.parse(tvFechHora.getText().toString().split(" ")[0]);
+                        } catch (ParseException e) {
+                            e.printStackTrace();
+                        }
+                        String svalo = sumarRestarDiasFecha(fecha, 1);
+                        tvInformacion.setText("Se reagendará automáticamente para el día: " + svalo);
                         dialog.dismiss();
                     }
                 })
                 .setCancelable(false)
                 .show();
     }
+
+    public String sumarRestarDiasFecha(Date fecha, int dias) {
+        DateFormat formatter = new SimpleDateFormat("yyyy/MM/dd");
+        try {
+            fecha = (Date) formatter.parse(fecha.toString());
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(fecha);
+        String year = String.valueOf(calendar.get(Calendar.YEAR));
+        String month = String.valueOf(calendar.get(Calendar.MONTH) + 1);
+        String day = String.valueOf(calendar.get(Calendar.DAY_OF_MONTH) + dias);
+
+        return day + "/" + month + "/" + year; // Devuelve el objeto Date con los nuevos días añadidos
+
+    }
+
     private void initClock() {
         runOnUiThread(new Runnable() {
             @Override
@@ -174,11 +245,11 @@ public class InformacionCliente extends AppCompatActivity {
                         updateTime();
                     }
                     Calendar c = Calendar.getInstance();
-                    String year =String.valueOf(c.get(Calendar.YEAR));
-                    String month = String.valueOf(c.get(Calendar.MONTH));
+                    String year = String.valueOf(c.get(Calendar.YEAR));
+                    String month = String.valueOf(c.get(Calendar.MONTH) + 1);
                     String day = String.valueOf(c.get(Calendar.DAY_OF_MONTH));
 
-                    curTime =day+"/"+month+"/"+ year+" "+hor + hora + min + minuto + sec + segundo;
+                    curTime = day + "/" + month + "/" + year + " " + hor + hora + min + minuto + sec + segundo;
                     tvFechHora.setText(curTime);
                 } catch (Exception e) {
                 }
@@ -214,20 +285,20 @@ public class InformacionCliente extends AppCompatActivity {
     }
 
     private void setZeroClock() {
-        if (hora>=0 & hora<=9) {
-            hor="0";
+        if (hora >= 0 & hora <= 9) {
+            hor = "0";
         } else {
-            hor="";
+            hor = "";
         }
-        if (minuto>=0 & minuto<=9) {
-            min=":0";
+        if (minuto >= 0 & minuto <= 9) {
+            min = ":0";
         } else {
-            min=":";
+            min = ":";
         }
-        if (segundo>=0 & segundo<=9) {
-            sec=":0";
+        if (segundo >= 0 & segundo <= 9) {
+            sec = ":0";
         } else {
-            sec=":";
+            sec = ":";
         }
 
     }
@@ -249,23 +320,20 @@ public class InformacionCliente extends AppCompatActivity {
         }
     }
 
-    public Boolean guardarClientes(String fecha, String fechainicio,String fechafin, String observacion, String codVendedor, String idCliente,String empresa, String estado) {
+    public Boolean reagendarClientes(String rtvid, String fecha, String observacion,String codVendedor, String idCliente) {
         //
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
 
         boolean Bandera = false;
 
-        SoapObject request = new SoapObject(configuracion.NAMESPACE, "GuardarClientesGPS");
+        SoapObject request = new SoapObject(configuracion.NAMESPACE, "ReagendarClientesGPS");
 //        request.addProperty("fecha", tvFecha.getText().toString());
+        request.addProperty("rtvid", rtvid);
         request.addProperty("fecha", fecha);
-        request.addProperty("fechainicio", fechainicio);
-        request.addProperty("fechafin", fechafin);
         request.addProperty("observacion", observacion);
         request.addProperty("codVendedor", codVendedor);
         request.addProperty("idCliente", idCliente);
-        request.addProperty("empresa", empresa);
-        request.addProperty("estado", estado);
         SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(SoapEnvelope.VER11);
         envelope.dotNet = true;
         envelope.setOutputSoapObject(request);
@@ -275,8 +343,8 @@ public class InformacionCliente extends AppCompatActivity {
         HttpTransportSE transporte = new HttpTransportSE(configuracion.URL);
         //transporte.debug = true;
         try {
-            transporte.call(configuracion.NAMESPACE + "GuardarClientesGPS", envelope);
-            Bandera =true;
+            transporte.call(configuracion.NAMESPACE + "ReagendarClientesGPS", envelope);
+            Bandera = true;
         } catch (Exception e) {
             //Print error
             e.printStackTrace();
@@ -284,7 +352,8 @@ public class InformacionCliente extends AppCompatActivity {
         }
         return Bandera;
     }
-    public Boolean actualizarClientes(String observacion, String fechainicio,String fechafin,String estado, String rtvi) {
+
+    public Boolean actualizarClientes(String observacion, String fechainicio, String fechafin, String estado, String rtvi) {
         //
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
@@ -304,7 +373,7 @@ public class InformacionCliente extends AppCompatActivity {
         HttpTransportSE transporte = new HttpTransportSE(configuracion.URL);
         try {
             transporte.call(configuracion.NAMESPACE + "ActualizarClientesGPS", envelope);
-            Bandera =true;
+            Bandera = true;
         } catch (Exception e) {
             //Print error
             e.printStackTrace();

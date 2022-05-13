@@ -60,13 +60,13 @@ public class CitaAdapter extends ArrayAdapter<Cita> {
         TextView tvNombreLista = (TextView) convertView.findViewById(R.id.tvNombreLista);
         TextView tvDireccionLista = (TextView) convertView.findViewById(R.id.tvDireccionLista);
 
-        tvNombreLista.setText(nombreCliente);
+        tvNombreLista.setText(rtvi+" - "+nombreCliente);
         tvDireccionLista.setText(direccion);
 
         btVerDetalleCliente.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 if (customListner != null) {
-                    customListner.onButtonClickListner(clte_id, infoC, "CONTINUAR");
+                    customListner.onButtonClickListner(rtvi, infoC, "CONTINUAR");
                 }
             }
         });

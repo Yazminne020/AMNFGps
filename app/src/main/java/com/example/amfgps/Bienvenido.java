@@ -55,7 +55,7 @@ import java.util.Date;
 
 public class Bienvenido extends AppCompatActivity implements CitaAdapter.customButtonListener {
 
-    TextView  tvB, tvHora, tvlocalizacion;
+    TextView tvB, tvHora, tvlocalizacion;
     EditText tvFecha;
     Button btnUbicacion;
     private String _usuario, Usuarioc, empresac, Clave;
@@ -69,7 +69,7 @@ public class Bienvenido extends AppCompatActivity implements CitaAdapter.customB
     private Cliente[] listaClientes;
     private Cita[] listaCitas, auxiliar, citas, auxiliar1;
     ListView listViewPedido;
-    CitaAdapter adapterp1;
+    //CitaAdapter adapterp1;
     ArrayList<Cita> names = new ArrayList<Cita>();
     ArrayList<Cita> names1 = new ArrayList<Cita>();
     String val = "";
@@ -141,24 +141,7 @@ public class Bienvenido extends AppCompatActivity implements CitaAdapter.customB
         ImageButton button = (ImageButton) findViewById(R.id.btnFechaDesdeDialog);
         button.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-//                Intent irbienvenido = new Intent(Bienvenido.this, MapsActivity.class);
-//                startActivity(irbienvenido);
-                try {
-                    citas = listaCitaClientes();
-                    val = tvlocalizacion.getText().toString();
-                    auxiliar = controlDistancia(val, citas);
-                    if (auxiliar != null) {
-                        for (int i = 0; i < auxiliar.length; i++) {
-
-                            names.add(auxiliar[i]);
-                        }
-                        adapterp1 = new CitaAdapter(Bienvenido.this, R.layout.lista_cita_cliente, names);
-                        listViewPedido.setAdapter(adapterp1);
-                        adapterp1.setCustomButtonListner(Bienvenido.this);
-                   }
-                } catch (Exception e) {
-                }
-
+                ubicacionGPS();
             }
         });
 
@@ -181,24 +164,7 @@ public class Bienvenido extends AppCompatActivity implements CitaAdapter.customB
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                // System.out.println(s.toString() + " " + start + " " + count);
-                if (tvlocalizacion.getText().toString().isEmpty() || tvFecha.getText().toString().isEmpty()) {
-
-                } else {
-                    citas = listaCitaClientes();
-                    val = tvlocalizacion.getText().toString();
-                    auxiliar = controlDistancia(val, citas);
-                    if (auxiliar != null) {
-                        for (int i = 0; i < auxiliar.length; i++) {
-
-                            names.add(auxiliar[i]);
-                        }
-                        adapterp1 = new CitaAdapter(Bienvenido.this, R.layout.lista_cita_cliente, names);
-                        listViewPedido.setAdapter(adapterp1);
-                        adapterp1.setCustomButtonListner(Bienvenido.this);
-                    }
-                }
-
+                ubicacionGPS();
 
             }
 
@@ -207,8 +173,45 @@ public class Bienvenido extends AppCompatActivity implements CitaAdapter.customB
                 // System.out.println(s.toString());
             }
         });
+        btnUbicacion.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View view) {
+                getCoordenada();
+            }
+        });
     }
 
+    private void ubicacionGPS() {
+        try {
+            names.clear();
+            CitaAdapter adapterp1 = new CitaAdapter(Bienvenido.this, R.layout.lista_cita_cliente, names);
+            if (tvlocalizacion.getText().toString().isEmpty() || tvFecha.getText().toString().isEmpty()) {
+
+            } else {
+                citas = listaCitaClientes();
+                val = tvlocalizacion.getText().toString();
+                auxiliar = controlDistancia(val, citas);
+                if (auxiliar != null) {
+                    for (int i = 0; i < auxiliar.length; i++) {
+
+                        names.add(auxiliar[i]);
+                    }
+                    adapterp1 = new CitaAdapter(Bienvenido.this, R.layout.lista_cita_cliente, names);
+                    listViewPedido.setAdapter(adapterp1);
+                    adapterp1.setCustomButtonListner(Bienvenido.this);
+                }
+            }
+        } catch (Exception e) {
+        }
+    }
+
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        ubicacionGPS();
+        Toast.makeText(Bienvenido.this, "Lista Actualizada", Toast.LENGTH_SHORT).show();
+    }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
@@ -274,8 +277,8 @@ public class Bienvenido extends AppCompatActivity implements CitaAdapter.customB
                 DatePickerDialog datePickerDialog = new DatePickerDialog(Bienvenido.this,
                         android.R.style.Theme_Holo_Light_Dialog_MinWidth, setListener, year, month, day);
                 datePickerDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-//                datePickerDialog.getDatePicker().setMinDate(System.currentTimeMillis() - 1000); //Bloquear tiempo pasado
-//                datePickerDialog.getDatePicker().setMaxDate(new Date().getTime() + (1000L * 60 * 60 * 24 * 31)); //Bloquear tiempo futuro
+                datePickerDialog.getDatePicker().setMinDate(System.currentTimeMillis() - 1000); //Bloquear tiempo pasado
+                datePickerDialog.getDatePicker().setMaxDate(new Date().getTime() + (1000L * 60 * 60 * 24 * 31)); //Bloquear tiempo futuro
                 datePickerDialog.show();
             }
         });
@@ -499,7 +502,7 @@ public class Bienvenido extends AppCompatActivity implements CitaAdapter.customB
             locationB.setLatitude(Double.parseDouble(citaClientes[i].latitud));
             locationB.setLongitude(Double.parseDouble(citaClientes[i].longitud));
             float distance = locationA.distanceTo(locationB);
-            valores[i] = (citaClientes[i].clte_id + "-" + distance);
+            valores[i] = (citaClientes[i].rtvi + "-" + distance);
         }
         for (int x = 0; x < valores.length; x++) {
             val[x] = Float.parseFloat(valores[x].split("-")[1]);
@@ -519,6 +522,8 @@ public class Bienvenido extends AppCompatActivity implements CitaAdapter.customB
             for (int x = 0; x < val.length; x++) {
                 if (list[i] == val[x]) {
                     aux[i] = valores[x];
+                    val[x] = 0;
+                    break;
                 }
             }
         }
@@ -530,7 +535,7 @@ public class Bienvenido extends AppCompatActivity implements CitaAdapter.customB
         for (int i = 0; i < orden.length; i++) {
             for (int x = 0; x < citaClientes.length; x++) {
                 String a = orden[i].split("-")[0];
-                if (a.equals(citaClientes[x].clte_id)) {
+                if (a.equals(citaClientes[x].rtvi)) {
                     aux[i] = citaClientes[x];
                     break;
                 }
@@ -614,7 +619,7 @@ public class Bienvenido extends AppCompatActivity implements CitaAdapter.customB
                 SoapObject ic = (SoapObject) resSoap.getProperty(i);
 
                 Cita cita = new Cita();
-                cita.rtvi=ic.getProperty("rtvi").toString();
+                cita.rtvi = ic.getProperty("rtvi").toString();
                 cita.diavisita = ic.getProperty("diavisita").toString();
                 cita.observacion = ic.getProperty("observacion").toString();
                 cita.vndr_codigo = ic.getProperty("vndr_codigo").toString();
