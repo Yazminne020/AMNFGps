@@ -154,6 +154,7 @@
         android:layout_height="126dp"
         android:ems="10"
         android:gravity="start|top"
+        android:hint="El día de hoy se realizó ..."
         android:inputType="textMultiLine"
         app:layout_constraintBottom_toTopOf="@+id/btnGuardar"
         app:layout_constraintEnd_toEndOf="parent"

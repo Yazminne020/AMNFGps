@@ -44,7 +44,7 @@
                 android:orientation="horizontal">
 
                 <EditText
-                    android:id="@+id/etFechaDesdeDialog"
+                    android:id="@+id/etFecha"
                     android:layout_width="142dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"

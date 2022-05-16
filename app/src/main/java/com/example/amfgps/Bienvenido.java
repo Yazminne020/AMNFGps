@@ -82,7 +82,7 @@ public class Bienvenido extends AppCompatActivity implements CitaAdapter.customB
         setContentView(R.layout.activity_bienvenido);
 
 
-        tvFecha = findViewById(R.id.etFechaDesdeDialog);
+        tvFecha = findViewById(R.id.etFecha);
         tvlocalizacion = findViewById(R.id.tvLocalizacion);
 //        tvHora = findViewById(R.id.etHora);
         btnUbicacion = findViewById(R.id.btnUbicacion);
