@@ -8,7 +8,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RadioButton;
-import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -28,15 +27,15 @@ import java.util.Date;
 
 public class InformacionCliente extends AppCompatActivity {
 
-    TextView tvCliente, tvPhone, tvDireccion, tvFechHora, tvInicio, tvFin,tvInformacion,tvCitaid;
+    TextView tvCliente, tvPhone, tvDireccion, tvFechHora, tvInicio, tvFin, tvInformacion, tvCitaid;
     EditText txtObservacion;
     Button btnMapa, btnInicio, btnFin, btnGuardar;
     RadioButton rbVisita, rbReagendar;
     int hora = 0, minuto = 0, segundo = 0;
     Thread iniReloj = null;
     Runnable r;
-    boolean isUpdate = false;
-    String sec, min, hor, curTime, rtviG = "";
+    boolean isUpdate = false,bander=false;
+    String sec, min, hor, curTime, rtviG = "",bandera = "";
     private Resultado[] listaResultado;
     Cita cita = new Cita();
 
@@ -58,8 +57,8 @@ public class InformacionCliente extends AppCompatActivity {
         btnGuardar = findViewById(R.id.btnGuardar);
         rbReagendar = findViewById(R.id.rbReagendar);
         txtObservacion = findViewById(R.id.txtObservacion);
-        tvInformacion=findViewById(R.id.tvInformacion);
-        tvCitaid=findViewById(R.id.tvCitaid);
+        tvInformacion = findViewById(R.id.tvInformacion);
+        tvCitaid = findViewById(R.id.tvCitaid);
 
         rbVisita.setChecked(true);
         r = new RefreshClock();
@@ -137,15 +136,14 @@ public class InformacionCliente extends AppCompatActivity {
                         } else {
                             Toast.makeText(InformacionCliente.this, "Ha ocurrido un error", Toast.LENGTH_SHORT).show();
                         }
-                    }else{
-                        if(rbReagendar.isChecked()){
-                            txtObservacion.setEnabled(true);
-                            boolean resp = reagendarClientes(cita.rtvi, txtObservacion.getText().toString().split(":")[1].trim(), tvInformacion.getText().toString()+". "+txtObservacion.getText().toString(),cita.vndr_codigo , cita.clte_id);
-                            if (resp) {
-                                Toast.makeText(InformacionCliente.this, "Guardado con Éxito", Toast.LENGTH_SHORT).show();
-                            } else {
-                                Toast.makeText(InformacionCliente.this, "Ha ocurrido un error", Toast.LENGTH_SHORT).show();
+                    } else {
+                        if (rbReagendar.isChecked()) {
+                            if (bander){
+                                guardarDatos(tvInicio.getText().toString().split(" ")[0],tvFin.getText().toString().split(" ")[0]);
+                            }else {
+                                guardarDatos("","");
                             }
+
                         }
                     }
                 } catch (Exception e) {
@@ -153,6 +151,27 @@ public class InformacionCliente extends AppCompatActivity {
                 }
             }
         });
+    }
+
+    public void guardarDatos(String fechaInicio,String fechaFin) {
+        if (bandera.equals("Automatica")) {
+            txtObservacion.setEnabled(true);
+            boolean resp = reagendarClientes(cita.rtvi, tvInformacion.getText().toString().split(":")[1].trim(), tvInformacion.getText() + ". " + txtObservacion.getText(), cita.vndr_codigo, cita.clte_id,fechaInicio,fechaFin);
+            if (resp) {
+                Toast.makeText(InformacionCliente.this, "Guardado con Éxito", Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(InformacionCliente.this, "Ha ocurrido un error", Toast.LENGTH_SHORT).show();
+            }
+        } else if (bandera.equals("No")) {
+            boolean resp = actualizarClientes(txtObservacion.getText().toString(), fechaInicio, fechaFin, "NO", rtviG);
+            if (resp) {
+                Toast.makeText(InformacionCliente.this, "Guardado con Éxito " + cita.rtvi, Toast.LENGTH_SHORT).show();
+                bloquearCampos(false);
+
+            } else {
+                Toast.makeText(InformacionCliente.this, "Ha ocurrido un error", Toast.LENGTH_SHORT).show();
+            }
+        }
     }
 
     private void bloquearCampos(boolean resp) {
@@ -172,7 +191,8 @@ public class InformacionCliente extends AppCompatActivity {
         switch (view.getId()) {
             case R.id.rbReagendar:
                 if (checked) {
-                    mostrarDialogoBasico();
+                    bander=dialogoFechas();
+
                 }
                 break;
             case R.id.rbVisita:
@@ -184,22 +204,64 @@ public class InformacionCliente extends AppCompatActivity {
         }
     }
 
+    private boolean dialogoFechas() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(InformacionCliente.this);
+        builder.setTitle("¿Se realizó la visita?");
+                    /*builder.setMessage("¿Se realizó la visita?");
+                     builder.setIcon(R.drawable.ic_launcher_background);*/
+        builder.setCancelable(false);
+        builder.setPositiveButton("Si", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                bander=true;
+                mostrarDialogoBasico();
+                dialog.cancel();
+            }
+        });
+        builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                bander=false;
+                mostrarDialogoBasico();
+                dialog.cancel();
+            }
+        });
+        builder.create().show();
+
+        return bander;
+    }
+
     private void mostrarDialogoBasico() {
         AlertDialog.Builder builder = new AlertDialog.Builder(InformacionCliente.this);
         builder.setTitle("Reagendar");
         builder.setMessage("¿Desea reagendar una cita para este cliente?")
-                .setPositiveButton("Sí", new DialogInterface.OnClickListener() {
+                .setPositiveButton("Manual", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
+                        bandera = "Manual";
+                        String var= String.valueOf(bander);
                         Intent informacionCli = new Intent(InformacionCliente.this, Reagenda.class);
-                        //informacionCli.putExtra("longLat", "cita.longLat");
+                        informacionCli.putExtra("rtvi", cita.rtvi);
+                        informacionCli.putExtra("vndr_codigo", cita.vndr_codigo);
+                        informacionCli.putExtra("clte_id", cita.clte_id);
+                        informacionCli.putExtra("nombreCliente", cita.nombreCliente);
+                        informacionCli.putExtra("direccion", cita.direccion);
+                        informacionCli.putExtra("telefono1", cita.telefono1);
+                        informacionCli.putExtra("telefono2", cita.telefono2);
+                        informacionCli.putExtra("bander",var);
+                        informacionCli.putExtra("finicio", tvInicio.getText().toString().split(" ")[0]);
+                        informacionCli.putExtra("ffin", tvFin.getText().toString().split(" ")[0]);
+
+
                         startActivity(informacionCli);
                         txtObservacion.setText("");
+                        txtObservacion.setEnabled(false);
                     }
                 })
-                .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                .setNegativeButton("Automática", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
+                        bandera = "Automatica";
                         Date fecha = new Date();
                         DateFormat formato = new SimpleDateFormat("dd/MM/yyyy");
                         try {
@@ -211,8 +273,16 @@ public class InformacionCliente extends AppCompatActivity {
                         tvInformacion.setText("Se reagendará automáticamente para el día: " + svalo);
                         dialog.dismiss();
                     }
-                })
-                .setCancelable(false)
+                }).setNeutralButton("No", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                bandera = "No";
+                txtObservacion.setText("");
+                tvInformacion.setText("");
+                //guardar con estado no
+                dialog.cancel();
+            }
+        })
                 .show();
     }
 
@@ -320,7 +390,7 @@ public class InformacionCliente extends AppCompatActivity {
         }
     }
 
-    public Boolean reagendarClientes(String rtvid, String fecha, String observacion,String codVendedor, String idCliente) {
+    public Boolean reagendarClientes(String rtvid, String fecha, String observacion, String codVendedor, String idCliente,String fechaInicio, String fechaFin) {
         //
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
@@ -334,6 +404,8 @@ public class InformacionCliente extends AppCompatActivity {
         request.addProperty("observacion", observacion);
         request.addProperty("codVendedor", codVendedor);
         request.addProperty("idCliente", idCliente);
+        request.addProperty("fechaInicio", fechaInicio);
+        request.addProperty("fechaFin", fechaFin);
         SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(SoapEnvelope.VER11);
         envelope.dotNet = true;
         envelope.setOutputSoapObject(request);

@@ -62,8 +62,8 @@
         app:layout_constraintTop_toBottomOf="@+id/textView13" />
 
     <EditText
-        android:id="@+id/editTextTextMultiLine"
-        android:layout_width="367dp"
+        android:id="@+id/txtObs"
+        android:layout_width="372dp"
         android:layout_height="99dp"
         android:layout_marginStart="16dp"
         android:layout_marginLeft="16dp"
@@ -72,6 +72,7 @@
         android:layout_marginRight="16dp"
         android:ems="10"
         android:gravity="start|top"
+        android:hint="El motivo por el cuál se reagenda, es ..."
         android:inputType="textMultiLine"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -86,21 +87,22 @@
         android:layout_marginTop="16dp"
         android:text="Fecha Reagendada:"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/editTextTextMultiLine" />
+        app:layout_constraintTop_toBottomOf="@+id/txtObs" />
 
     <TextView
-        android:id="@+id/textView17"
+        android:id="@+id/txtCita"
         android:layout_width="238dp"
         android:layout_height="21dp"
+        android:layout_marginTop="16dp"
         android:layout_marginEnd="8dp"
         android:layout_marginRight="8dp"
         android:text="TextView"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/textView8"
-        tools:layout_editor_absoluteY="16dp" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:id="@+id/textView18"
+        android:id="@+id/txtNombre"
         android:layout_width="238dp"
         android:layout_height="21dp"
         android:layout_marginTop="12dp"
@@ -110,10 +112,10 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.61"
         app:layout_constraintStart_toEndOf="@+id/textView9"
-        app:layout_constraintTop_toBottomOf="@+id/textView17" />
+        app:layout_constraintTop_toBottomOf="@+id/txtCita" />
 
     <TextView
-        android:id="@+id/textView20"
+        android:id="@+id/txtDireccion"
         android:layout_width="238dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
@@ -123,10 +125,10 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.75"
         app:layout_constraintStart_toEndOf="@+id/textView12"
-        app:layout_constraintTop_toBottomOf="@+id/textView18" />
+        app:layout_constraintTop_toBottomOf="@+id/txtNombre" />
 
     <TextView
-        android:id="@+id/textView21"
+        android:id="@+id/txtTelefono"
         android:layout_width="238dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
@@ -136,5 +138,33 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.77"
         app:layout_constraintStart_toEndOf="@+id/textView13"
-        app:layout_constraintTop_toBottomOf="@+id/textView20" />
+        app:layout_constraintTop_toBottomOf="@+id/txtDireccion" />
+
+    <EditText
+        android:id="@+id/etFecha"
+        android:layout_width="384dp"
+        android:layout_height="42dp"
+        android:layout_marginTop="8dp"
+        android:layout_weight="1"
+        android:autofillHints="01/01/2000"
+        android:hint="@string/reagenda"
+        android:inputType="date"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView16"
+        tools:targetApi="o" />
+
+    <Button
+        android:id="@+id/btnSave"
+        android:layout_width="410dp"
+        android:layout_height="40dp"
+        android:layout_marginTop="28dp"
+        android:text="Reagendar"
+        app:backgroundTint="#E98E0B0B"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/etFecha" />
+
+
 </androidx.constraintlayout.widget.ConstraintLayout>
