@@ -84,11 +84,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap.setMyLocationEnabled(true);
         mMap.getUiSettings().setZoomControlsEnabled(true);
         mMap.getUiSettings().setMapToolbarEnabled(true);
-        String lon=longLat.split(" ")[0];
-        String lat=longLat.split(" ")[1];
+        double lat=Double.parseDouble(longLat.split(" ")[0]);
+        double lon=Double.parseDouble(longLat.split(" ")[1]);
 
-        LatLng l1 = new LatLng(Double.valueOf(lat),Double.valueOf(lon));
-//        LatLng l2 = new LatLng(  -1.2124967,  -78.5975868);
+        LatLng l1 = new LatLng(lat,lon);
+        //LatLng l1 = new LatLng(  -1.2124967,  -78.5975868);
         LatLng l2 = new LatLng(Double.valueOf(latitud), Double.valueOf(longitud));
 
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(l1, 8));
