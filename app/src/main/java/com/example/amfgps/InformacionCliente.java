@@ -35,7 +35,7 @@ public class InformacionCliente extends AppCompatActivity {
     Thread iniReloj = null;
     Runnable r;
     boolean isUpdate = false,bander=false;
-    String sec, min, hor, curTime, rtviG = "",bandera = "";
+    String sec, min, hor, curTime, rtviG = "",bandera = "", usuario, empresa;
     private Resultado[] listaResultado;
     Cita cita = new Cita();
 
@@ -83,6 +83,8 @@ public class InformacionCliente extends AppCompatActivity {
             cita.telefono1 = extras.getString("telefono1");
             cita.telefono2 = extras.getString("telefono2");
             cita.estado = extras.getString("estado");
+            usuario=extras.getString("usuario");
+            empresa=extras.getString("empresa");
 
             rtviG = cita.rtvi;
             tvCliente.setText(cita.nombreCliente);
@@ -132,7 +134,9 @@ public class InformacionCliente extends AppCompatActivity {
                         if (resp) {
                             Toast.makeText(InformacionCliente.this, "Actualizado con Éxito " + cita.rtvi, Toast.LENGTH_SHORT).show();
                             bloquearCampos(false);
-
+                            Intent informacionCli = new Intent(InformacionCliente.this, Bienvenido.class);
+                            informacionCli.putExtra("usuarioc", usuario);
+                            informacionCli.putExtra("empresac", empresa);
                         } else {
                             Toast.makeText(InformacionCliente.this, "Ha ocurrido un error", Toast.LENGTH_SHORT).show();
                         }
@@ -251,7 +255,8 @@ public class InformacionCliente extends AppCompatActivity {
                         informacionCli.putExtra("bander",var);
                         informacionCli.putExtra("finicio", tvInicio.getText().toString().split(" ")[0]);
                         informacionCli.putExtra("ffin", tvFin.getText().toString().split(" ")[0]);
-
+                        informacionCli.putExtra("usuario",usuario);
+                        informacionCli.putExtra("empresa",empresa);
 
                         startActivity(informacionCli);
                         txtObservacion.setText("");

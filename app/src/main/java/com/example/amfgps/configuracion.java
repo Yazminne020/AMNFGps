@@ -11,8 +11,8 @@ public class configuracion extends Application {
 
     public static final String NAMESPACE = "http://android.sinv.com/";
     //  public static final String URL = "http://181.211.115.78:89/Service1.asmx";// AMNF
-    //  public static final String URL = "http://192.168.1.77:82/Service1.asmx";//
-    public static final String URL = "http://192.168.1.77:86/Service1.asmx";//
+      public static final String URL = "http://silver-erp.com:60994/service1.asmx";//
+    //public static final String URL = "http://192.168.1.77:86/Service1.asmx";//
     //    public static final String URL = "http://190.95.238.226:86/Service1.asmx";// DMAR - DMTX WAN
     //    public static final String URL = "http://192.168.1.246:86/Service1.asmx";// DMAR - DMTX LAN
     /* Enlace para ICOPLAST */

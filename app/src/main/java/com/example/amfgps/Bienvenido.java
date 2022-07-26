@@ -277,8 +277,8 @@ public class Bienvenido extends AppCompatActivity implements CitaAdapter.customB
                 DatePickerDialog datePickerDialog = new DatePickerDialog(Bienvenido.this,
                         android.R.style.Theme_Holo_Light_Dialog_MinWidth, setListener, year, month, day);
                 datePickerDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-                datePickerDialog.getDatePicker().setMinDate(System.currentTimeMillis() - 1000); //Bloquear tiempo pasado
-                datePickerDialog.getDatePicker().setMaxDate(new Date().getTime() + (1000L * 60 * 60 * 24 * 31)); //Bloquear tiempo futuro
+                //datePickerDialog.getDatePicker().setMinDate(System.currentTimeMillis() - 1000); //Bloquear tiempo pasado
+                //.getDatePicker().setMaxDate(new Date().getTime() + (1000L * 60 * 60 * 24 * 31)); //Bloquear tiempo futuro
                 datePickerDialog.show();
             }
         });
@@ -330,6 +330,8 @@ public class Bienvenido extends AppCompatActivity implements CitaAdapter.customB
             informacionCli.putExtra("telefono1", value.telefono1);
             informacionCli.putExtra("telefono2", value.telefono2);
             informacionCli.putExtra("estado", value.estado);
+            informacionCli.putExtra("usuario", Usuarioc);
+            informacionCli.putExtra("empresa", empresac);
 
 
             startActivity(informacionCli);
@@ -600,8 +602,8 @@ public class Bienvenido extends AppCompatActivity implements CitaAdapter.customB
             dato = extras.getString("usuarioc");
         }
         SoapObject request = new SoapObject(configuracion.NAMESPACE, "ClientesGPS");
-//        request.addProperty("fecha", tvFecha.getText().toString());
-        request.addProperty("fecha", "20/12/2021");
+        request.addProperty("fecha", tvFecha.getText().toString());
+        //request.addProperty("fecha", "20/12/2021");
         request.addProperty("ceduruc", dato);
         SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(SoapEnvelope.VER11);
         envelope.dotNet = true;

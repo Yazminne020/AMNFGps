@@ -15,7 +15,7 @@ public class Reagenda extends AppCompatActivity {
     TextView txtCita, txtNombre, txtDireccion, txtTelefono;
     Cita cita = new Cita();
     Button btnSave;
-    String  finicio, ffin,bander;
+    String  finicio, ffin,bander, usuario, empresa;
     EditText etFecha,txtObs;
 
 
@@ -45,6 +45,8 @@ public class Reagenda extends AppCompatActivity {
             bander = extras.getString("bander");
             finicio = extras.getString("finicio");
             ffin = extras.getString("ffin");
+            usuario=extras.getString("usuario");
+            empresa=extras.getString("empresa");
 
             txtNombre.setText(cita.nombreCliente);
             txtTelefono.setText(cita.telefono1 + " " + cita.telefono2);
@@ -71,6 +73,10 @@ public class Reagenda extends AppCompatActivity {
             boolean resp = iCliente.reagendarClientes(cita.rtvi, etFecha.getText().toString().trim(), txtObs.getText().toString(), cita.vndr_codigo, cita.clte_id,fechaInicio,fechaFin);
             if (resp) {
                 Toast.makeText(Reagenda.this, "Guardado con Éxito", Toast.LENGTH_SHORT).show();
+                Intent informacionCli = new Intent(Reagenda.this, Bienvenido.class);
+                informacionCli.putExtra("usuarioc", usuario);
+                informacionCli.putExtra("empresac", empresa);
+                startActivity(informacionCli);
             } else {
                 Toast.makeText(Reagenda.this, "Ha ocurrido un error", Toast.LENGTH_SHORT).show();
             }
